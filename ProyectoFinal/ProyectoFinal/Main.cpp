@@ -25,7 +25,8 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
 
 // Window dimensions
-const GLuint WIDTH = 800, HEIGHT = 600;
+//const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 1280, HEIGHT = 720;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
@@ -151,9 +152,9 @@ int main()
 	Model Casa((char*)"Models/casa.obj");
 	/*Model Arbusto((char*)"Models/arbusto.fbx");
 	Model Arbol((char*)"Models/arbol.obj");
-	Model Farol((char*)"Models/faro.obj");
+	Model Farol((char*)"Models/faro.obj");*/
 	Model Cesped((char*)"Models/cesped.obj");
-	Model Cielo((char*)"Models/cieloo.obj");*/
+	Model Cielo((char*)"Models/cieloo.obj");
 
 	// Modelos interior cocina
 	Model Pared_Cocina((char*)"Models/pared_cocina.obj");
@@ -174,6 +175,7 @@ int main()
 
 	// Modelos interior habitacion
 	Model Cama((char*)"Models/cama.obj");
+	Model Trampolin((char*)"Models/trampolin.obj");
 
 
 
@@ -196,7 +198,7 @@ int main()
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "material.specular"), 1);
 
-	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 200.0f);	
+	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 250.0f);	
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -401,18 +403,18 @@ int main()
 		//Farol.Draw(lightingShader);
 
 		////Cesped
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-17.0f, -13.0f, 80.0f));
-		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Cesped.Draw(lightingShader);
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-17.0f, -13.0f, 80.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cesped.Draw(lightingShader);
 
 		////Cielo
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-17.0f, -14.0f, 80.0f));
-		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Cielo.Draw(lightingShader);
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-17.0f, -14.0f, 80.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cielo.Draw(lightingShader);
 
 		///////////////////////////-Fachada-////////////////////////////////
 		//Casa
@@ -605,6 +607,12 @@ int main()
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Cama.Draw(lightingShader);
+		//Trampolin
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-1.2f, 1.0f, -1.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Trampolin.Draw(lightingShader);
 
 
 		// Also draw the lamp object, again binding the appropriate shader

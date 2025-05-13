@@ -149,19 +149,19 @@ int main()
 
 	//Modelos exterior
 	Model Casa((char*)"Models/casa.obj");
-	Model Arbusto((char*)"Models/arbusto.fbx");
+	/*Model Arbusto((char*)"Models/arbusto.fbx");
 	Model Arbol((char*)"Models/arbol.obj");
 	Model Farol((char*)"Models/faro.obj");
 	Model Cesped((char*)"Models/cesped.obj");
-	Model Cielo((char*)"Models/cieloo.obj");
+	Model Cielo((char*)"Models/cieloo.obj");*/
 
-	// Modelos interior
-	Model Puerta_Cocina((char*)"Models/puerta_cocina.obj");
-	Model Ventana_Cocina((char*)"Models/ventana_cocina.obj");
+	// Modelos interior cocina
 	Model Pared_Cocina((char*)"Models/pared_cocina.obj");
 	Model Pared_Cocina_Anterior((char*)"Models/pared_cocina_anterior.obj");
-	Model Pared_Madera((char*)"Models/pared_madera.obj");
 	Model Piso_Cocina((char*)"Models/piso_cocina.obj");
+	/*Model Puerta_Cocina((char*)"Models/puerta_cocina.obj");
+	Model Ventana_Cocina((char*)"Models/ventana_cocina.obj");
+	Model Pared_Madera((char*)"Models/pared_madera.obj");
 	Model Alacena((char*)"Models/alacena.obj");
 	Model Alacena_Superior((char*)"Models/alacena_superior.obj");
 	Model Alacena_Grande((char*)"Models/alacena_grande.obj");
@@ -170,7 +170,11 @@ int main()
 	Model Mesa((char*)"Models/mesa.obj");
 	Model Refrigerador((char*)"Models/refrigerador.obj");
 	Model Silla((char*)"Models/silla.obj");
-	Model Tostadora((char*)"Models/tostadora.obj");
+	Model Tostadora((char*)"Models/tostadora.obj");*/
+
+	// Modelos interior habitacion
+	Model Cama((char*)"Models/cama.obj");
+
 
 
 	// First, set the container's VAO (and VBO)
@@ -330,87 +334,87 @@ int main()
 
 		/////////////////////////-Ambientacion-////////////////////////////////
 		//Arbusto central
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(58.0f, -10.0f, 20.0f));
-		model = glm::scale(model, glm::vec3(18.0f, 20.0f, 18.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbusto.Draw(lightingShader);
-		//Arbusto izquierdo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(45.0f, -10.0f, 22.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbusto.Draw(lightingShader);
-		//Arbusto derecho
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(75.0f, -10.0f, 21.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbusto.Draw(lightingShader);
-		//Arbusto derecho 2
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(85.0f, -10.0f, 21.0f));
-		model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbusto.Draw(lightingShader);
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(58.0f, -10.0f, 20.0f));
+		//model = glm::scale(model, glm::vec3(18.0f, 20.0f, 18.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbusto.Draw(lightingShader);
+		////Arbusto izquierdo
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(45.0f, -10.0f, 22.0f));
+		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbusto.Draw(lightingShader);
+		////Arbusto derecho
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(75.0f, -10.0f, 21.0f));
+		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbusto.Draw(lightingShader);
+		////Arbusto derecho 2
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(85.0f, -10.0f, 21.0f));
+		//model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbusto.Draw(lightingShader);
 
-		//Arbol derecha
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(90.0f, -10.0f, -30.0f));
-		model = glm::scale(model, glm::vec3(12.0f, 12.0f, 12.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbol.Draw(lightingShader);
-		//Arbol izquierda
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-90.0f, -10.0f, 30.0f));
-		model = glm::scale(model, glm::vec3(12.0f, 12.0f, 12.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbol.Draw(lightingShader);
-		//Arbol 1
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-80.0f, -10.0f, -30.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbol.Draw(lightingShader);
-		//Arbol 2
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-150.0f, -10.0f, -70.0f));
-		model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbol.Draw(lightingShader);
-		//Arbol 2
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-230.0f, -10.0f, -70.0f));
-		model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Arbol.Draw(lightingShader);
-		
-		//Faro
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-17.0f, -10.0f, 80.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Farol.Draw(lightingShader);
+		////Arbol derecha
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(90.0f, -10.0f, -30.0f));
+		//model = glm::scale(model, glm::vec3(12.0f, 12.0f, 12.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbol.Draw(lightingShader);
+		////Arbol izquierda
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-90.0f, -10.0f, 30.0f));
+		//model = glm::scale(model, glm::vec3(12.0f, 12.0f, 12.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbol.Draw(lightingShader);
+		////Arbol 1
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-80.0f, -10.0f, -30.0f));
+		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbol.Draw(lightingShader);
+		////Arbol 2
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-150.0f, -10.0f, -70.0f));
+		//model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbol.Draw(lightingShader);
+		////Arbol 2
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-230.0f, -10.0f, -70.0f));
+		//model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Arbol.Draw(lightingShader);
+		//
+		////Faro
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-17.0f, -10.0f, 80.0f));
+		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Farol.Draw(lightingShader);
 
-		//Cesped
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-17.0f, -13.0f, 80.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Cesped.Draw(lightingShader);
+		////Cesped
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-17.0f, -13.0f, 80.0f));
+		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Cesped.Draw(lightingShader);
 
-		//Cielo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-17.0f, -14.0f, 80.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Cielo.Draw(lightingShader);
+		////Cielo
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-17.0f, -14.0f, 80.0f));
+		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Cielo.Draw(lightingShader);
 
-		/////////////////////////-Fachada-////////////////////////////////
+		///////////////////////////-Fachada-////////////////////////////////
 		//Casa
 		model = glm::mat4(1);
 		model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
@@ -430,15 +434,15 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Piso_Cocina.Draw(lightingShader);
 
-		////////////////////////-Cocina-////////////////////////////////
-		////////////////////////-Estructura-////////////////////////////////
-		//Piso
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-10.2f, 4.1f, -12.7f));
-		model = glm::scale(model, glm::vec3(1.28, 1.0f, 0.84f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso_Cocina.Draw(lightingShader);
+		//////////////////////////-Cocina-////////////////////////////////
+		//////////////////////////-Estructura-////////////////////////////////
+		////Piso
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-10.2f, 4.1f, -12.7f));
+		//model = glm::scale(model, glm::vec3(1.28, 1.0f, 0.84f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Piso_Cocina.Draw(lightingShader);
 		//Techo
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(-10.2f, 13.0f, -12.7f));
@@ -472,127 +476,135 @@ int main()
 		model = glm::scale(model, glm::vec3(1.0f, 2.06f, 1.28f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Pared_Cocina_Anterior.Draw(lightingShader);
-		////Ventana
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-21.2f, 10.2f, -20.37f));
-		model = glm::scale(model, glm::vec3(3.35f, 3.35f, 1.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Ventana_Cocina.Draw(lightingShader);
-		//Puerta interior
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-4.8f, 7.2f, -20.15f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Puerta_Cocina.Draw(lightingShader);
-		//Puerta exterior
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-4.8f, 7.2f, -21.35f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Puerta_Cocina.Draw(lightingShader);
-		//Pared Madera 1
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-7.9f, 6.2f, -20.3f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Pared_Madera.Draw(lightingShader);
-		//Pared Madera 2
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-1.6f, 6.2f, -20.3f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Pared_Madera.Draw(lightingShader);
+		//////Ventana
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-21.2f, 10.2f, -20.37f));
+		//model = glm::scale(model, glm::vec3(3.35f, 3.35f, 1.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Ventana_Cocina.Draw(lightingShader);
+		////Puerta interior
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-4.8f, 7.2f, -20.15f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Puerta_Cocina.Draw(lightingShader);
+		////Puerta exterior
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-4.8f, 7.2f, -21.35f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Puerta_Cocina.Draw(lightingShader);
+		////Pared Madera 1
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-7.9f, 6.2f, -20.3f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Pared_Madera.Draw(lightingShader);
+		////Pared Madera 2
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-1.6f, 6.2f, -20.3f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Pared_Madera.Draw(lightingShader);
 
-		//////////////////////////-Objetos-////////////////////////////////
-		////Alacena 1
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-19.0f, 4.74f, -17.57f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.0f, 1.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Alacena.Draw(lightingShader);	
-		////Alacena 2
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-21.1f, 4.74f, -14.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Alacena.Draw(lightingShader);
-		////Alacena 3
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-19.0f, 4.74f, -10.5f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.0f, 1.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Alacena.Draw(lightingShader);
-		////Alacena 4
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-17.1f, 4.74f, -14.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Alacena.Draw(lightingShader);
-		////Alacena 5
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-13.1f, 4.74f, -14.0f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Alacena.Draw(lightingShader);
-		//Alacena 6
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-15.0f, 11.5f, -19.1f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Alacena_Superior.Draw(lightingShader);
-		//Alacena 7
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-25.5f, 9.8f, -17.0f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Alacena_Grande.Draw(lightingShader);
+		////////////////////////////-Objetos-////////////////////////////////
+		//////Alacena 1
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-19.0f, 4.74f, -17.57f));
+		//model = glm::scale(model, glm::vec3(1.2f, 1.0f, 1.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Alacena.Draw(lightingShader);	
+		//////Alacena 2
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-21.1f, 4.74f, -14.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Alacena.Draw(lightingShader);
+		//////Alacena 3
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-19.0f, 4.74f, -10.5f));
+		//model = glm::scale(model, glm::vec3(1.2f, 1.0f, 1.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Alacena.Draw(lightingShader);
+		//////Alacena 4
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-17.1f, 4.74f, -14.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Alacena.Draw(lightingShader);
+		//////Alacena 5
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-13.1f, 4.74f, -14.0f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Alacena.Draw(lightingShader);
+		////Alacena 6
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-15.0f, 11.5f, -19.1f));
+		//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Alacena_Superior.Draw(lightingShader);
+		////Alacena 7
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-25.5f, 9.8f, -17.0f));
+		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Alacena_Grande.Draw(lightingShader);
 
-		////Estufa
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-21.15f, 5.91f, -23.85f));	
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Estufa.Draw(lightingShader);
-		////Campana
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-19.2f, 6.1f, -23.4f));
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 200.0f);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Campana.Draw(lightingShader);
-		//Refrigerador
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-16.8f, 4.7f, -19.1f));
-		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Refrigerador.Draw(lightingShader);
-		//Mesa
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-11.3, 6.82f, -11.75));
-		model = glm::scale(model, glm::vec3(0.85f, 0.9f, 0.85f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Mesa.Draw(lightingShader);
-		//Silla 1
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-15.3, 6.4f, -5.0f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
-		model = glm::rotate(model, glm::radians(315.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Silla.Draw(lightingShader);
-		//Silla 2
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-24.3, 6.4f, -9.6f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
-		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Silla.Draw(lightingShader);
-		//Tostadora
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-11.5f, 4.74f, -16.5f));
-		model = glm::rotate(model, glm::radians(315.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Tostadora.Draw(lightingShader);
+		//////Estufa
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-21.15f, 5.91f, -23.85f));	
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Estufa.Draw(lightingShader);
+		//////Campana
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-19.2f, 6.1f, -23.4f));
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 200.0f);
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Campana.Draw(lightingShader);
+		////Refrigerador
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-16.8f, 4.7f, -19.1f));
+		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Refrigerador.Draw(lightingShader);
+		////Mesa
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-11.3, 6.82f, -11.75));
+		//model = glm::scale(model, glm::vec3(0.85f, 0.9f, 0.85f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Mesa.Draw(lightingShader);
+		////Silla 1
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-15.3, 6.4f, -5.0f));
+		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
+		//model = glm::rotate(model, glm::radians(315.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Silla.Draw(lightingShader);
+		////Silla 2
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-24.3, 6.4f, -9.6f));
+		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
+		//model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Silla.Draw(lightingShader);
+		////Tostadora
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-11.5f, 4.74f, -16.5f));
+		//model = glm::rotate(model, glm::radians(315.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Tostadora.Draw(lightingShader);
+
+		////////////////////////-Habitacion-////////////////////////////////
+		////////////////////////-Estructura-////////////////////////////////
 		
+		////////////////////////-Objetos-////////////////////////////////
+		//Cama
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cama.Draw(lightingShader);
 
 
 		// Also draw the lamp object, again binding the appropriate shader

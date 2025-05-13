@@ -1,20 +1,15 @@
 #include <iostream>
 #include <cmath>
-
 // GLEW
 #include <GL/glew.h>
-
 // GLFW
 #include <GLFW/glfw3.h>
-
 // Other Libs
 #include "stb_image.h"
-
 // GLM Mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 //Load Models
 #include "SOIL2/SOIL2.h"
 

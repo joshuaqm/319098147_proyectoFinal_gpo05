@@ -34,7 +34,7 @@ out vec4 color;
 
 uniform vec3 viewPos;
 uniform DirLight dirLight;
-uniform PointLight pointLights[2];  // Cambiado a array de 2 luces
+uniform PointLight pointLights[3];  // Cambiado a array de 2 luces
 uniform Material material;
 
 // Function prototypes
@@ -51,7 +51,7 @@ void main()
     vec3 result = CalcDirLight(dirLight, norm, viewDir);
     
     // Luces puntuales
-    for(int i = 0; i < 2; i++)
+    for(int i = 0; i < 3; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     
     vec4 texColor = texture(material.diffuse, TexCoords);

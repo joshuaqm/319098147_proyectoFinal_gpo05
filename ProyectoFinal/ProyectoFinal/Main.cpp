@@ -30,8 +30,8 @@ const GLuint WIDTH = 1280, HEIGHT = 720;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
-//Camera  camera(glm::vec3(0.0f, 0.0f, 0.0f));
+//Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
+Camera  camera(glm::vec3(0.0f, 35.0f, 0.0f));
 
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
@@ -154,12 +154,12 @@ int main()
 	Model Arbol((char*)"Models/arbol.obj");
 	Model Farol((char*)"Models/faro.obj");*/
 	Model Cesped((char*)"Models/cesped.obj");
-	Model Cielo((char*)"Models/cieloo.obj");
+	//Model Cielo((char*)"Models/cieloo.obj");
 
 	// Modelos interior cocina
 	Model Pared_Cocina((char*)"Models/pared_cocina.obj");
 	Model Pared_Cocina_Anterior((char*)"Models/pared_cocina_anterior.obj");
-	Model Piso_Cocina((char*)"Models/piso_cocina.obj");
+	Model Piso((char*)"Models/piso_cocina.obj");
 	/*Model Puerta_Cocina((char*)"Models/puerta_cocina.obj");
 	Model Ventana_Cocina((char*)"Models/ventana_cocina.obj");
 	Model Pared_Madera((char*)"Models/pared_madera.obj");
@@ -174,10 +174,14 @@ int main()
 	Model Tostadora((char*)"Models/tostadora.obj");*/
 
 	// Modelos interior habitacion
+	Model Archivero((char*)"Models/archivero.obj");
+	Model Buro((char*)"Models/buro.obj");
+	Model Cajones((char*)"Models/cajones.obj");
 	Model Cama((char*)"Models/cama.obj");
+	Model Pared_Habitacion((char*)"Models/pared_habitacion.obj");
+	Model Television_Habitacion((char*)"Models/television_habitacion.obj");
 	Model Trampolin((char*)"Models/trampolin.obj");
-
-
+	Model Ventana_Habitacion((char*)"Models/ventana_habitacion.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -410,11 +414,11 @@ int main()
 		Cesped.Draw(lightingShader);
 
 		////Cielo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-17.0f, -14.0f, 80.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Cielo.Draw(lightingShader);
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-17.0f, -14.0f, 80.0f));
+		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Cielo.Draw(lightingShader);
 
 		///////////////////////////-Fachada-////////////////////////////////
 		//Casa
@@ -428,13 +432,13 @@ int main()
 		model = glm::scale(model, glm::vec3(2.7f, 1.0f, 1.9f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso_Cocina.Draw(lightingShader);
+		Piso.Draw(lightingShader);
 		//Techo
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(3.75f, 13.65f, 2.65f));
 		model = glm::scale(model, glm::vec3(2.55f, 1.0f, 1.75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso_Cocina.Draw(lightingShader);
+		Piso.Draw(lightingShader);
 
 		//////////////////////////-Cocina-////////////////////////////////
 		//////////////////////////-Estructura-////////////////////////////////
@@ -444,40 +448,40 @@ int main()
 		//model = glm::scale(model, glm::vec3(1.28, 1.0f, 0.84f));
 		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Piso_Cocina.Draw(lightingShader);
-		//Techo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-10.2f, 13.0f, -12.7f));
-		model = glm::scale(model, glm::vec3(1.28, 1.0f, 0.84f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso_Cocina.Draw(lightingShader);
-		//Pared izquierda
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-15.57f, 3.3f, -9.6f));
-		model = glm::scale(model, glm::vec3(1.0f, 2.06f, 0.85f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Pared_Cocina.Draw(lightingShader);
-		//Pared derecha
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(12.0f, 3.3f, -9.6f));
-		model = glm::scale(model, glm::vec3(1.0f, 2.06f, 0.85f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Pared_Cocina.Draw(lightingShader);
-		//Pared posterior
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-10.2f, 3.3f, -32.3f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); 
-		model = glm::scale(model, glm::vec3(1.0f, 2.06f, 1.28f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Pared_Cocina.Draw(lightingShader);
-		//Pared anterior
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-10.2f, 3.3f, -14.2f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 2.06f, 1.28f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Pared_Cocina_Anterior.Draw(lightingShader);
+		//Piso.Draw(lightingShader);
+		////Techo
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-10.2f, 13.0f, -12.7f));
+		//model = glm::scale(model, glm::vec3(1.28, 1.0f, 0.84f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Piso.Draw(lightingShader);
+		////Pared izquierda
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-15.57f, 3.3f, -9.6f));
+		//model = glm::scale(model, glm::vec3(1.0f, 2.06f, 0.85f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Pared_Cocina.Draw(lightingShader);
+		////Pared derecha
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(12.0f, 3.3f, -9.6f));
+		//model = glm::scale(model, glm::vec3(1.0f, 2.06f, 0.85f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Pared_Cocina.Draw(lightingShader);
+		////Pared posterior
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-10.2f, 3.3f, -32.3f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); 
+		//model = glm::scale(model, glm::vec3(1.0f, 2.06f, 1.28f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Pared_Cocina.Draw(lightingShader);
+		////Pared anterior
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(-10.2f, 3.3f, -14.2f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(1.0f, 2.06f, 1.28f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Pared_Cocina_Anterior.Draw(lightingShader);
 		//////Ventana
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(-21.2f, 10.2f, -20.37f));
@@ -601,15 +605,36 @@ int main()
 
 		////////////////////////-Habitacion-////////////////////////////////
 		////////////////////////-Estructura-////////////////////////////////
-		
+		//Piso
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(3.0f, 25.4f, 0.2f));
+		model = glm::scale(model, glm::vec3(2.15f, 1.0f, 1.35f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Piso.Draw(lightingShader);
+		//Techo
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(3.0f, 35.3f, 0.19f));
+		model = glm::scale(model, glm::vec3(2.155f, 1.0f, 1.36f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Piso.Draw(lightingShader);
+		//Pared posterior
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(10.0f, 30.5f, -10.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Pared_Habitacion.Draw(lightingShader);
+
+
 		////////////////////////-Objetos-////////////////////////////////
 		//Cama
 		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(0.0f, 30.5f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Cama.Draw(lightingShader);
 		//Trampolin
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-1.2f, 1.0f, -1.0f));
+		model = glm::translate(model, glm::vec3(-1.2f, 30.5f, -1.0f));
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Trampolin.Draw(lightingShader);

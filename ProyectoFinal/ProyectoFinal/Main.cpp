@@ -38,6 +38,7 @@ float smoothstep(float edge0, float edge1, float x) {
 }
 void updateTrampolineJump(float deltaTime);
 
+
 // Window dimensions
 //const GLuint WIDTH = 800, HEIGHT = 600;
 const GLuint WIDTH = 1280, HEIGHT = 720;
@@ -75,15 +76,33 @@ glm::vec3 pivotPoint = glm::vec3(35.0f, -6.52f, 46.0f); // Punto de pivote (rued
 glm::vec3 trampolinPos = glm::vec3(19.0f, 27.2f, -14.5f);  // Posición del trampolín
 glm::vec3 rigbyBasePos = glm::vec3(19.0f, 27.3f, -14.55f); // Posición base de Rigby
 float rigbyScale = 0.03f;                                  // Escala de Rigby
-
-// Parámetros del salto
-float jumpHeight = 1.5f;    // Altura del salto (ajusta según necesidad)
+float jumpHeight = 1.5f;    // Altura del salto
 float jumpSpeed = 1.2f;     // Velocidad del rebotea
 float jumpProgress = 0.0f;  // Progreso del salto (0 a 1)
 bool isAscending = true;    // Dirección del salto
 float squashFactor = 0.0f;  // Controla la compresión (0 = normal, 1 = máximo squash)
 float squashIntensity = 0.1f; // Qué tanto se comprime (20% de su escala original)
 
+// Animacion viento
+float windTime = 0.0f;       // Acumulador de tiempo
+float windSpeed = 1.2f;      // Velocidad del viento (1.0 = suave, 3.0 = rápido)
+float windIntensity = 0.15f; // Fuerza del viento (0.1 = sutil, 0.5 = fuerte)
+glm::mat4 applyTreeWind(glm::mat4 model, float offset) {
+	// Rotación en Z (inclinación del árbol)
+	float tilt = sin(windTime * windSpeed + offset) * windIntensity;
+	model = glm::rotate(model, tilt, glm::vec3(0.0f, 0.0f, 1.0f));
+
+	// Escalado en X/Y para simular hojas moviéndose
+	float scaleX = 1.0f + sin(windTime * windSpeed * 2.0f + offset) * windIntensity * 0.1f;
+	float scaleY = 1.0f - sin(windTime * windSpeed * 2.0f + offset) * windIntensity * 0.05f;
+	model = glm::scale(model, glm::vec3(scaleX, scaleY, 1.0f));
+
+	return model;
+}
+
+// Animacion sillas
+bool sillaRecorrida = false; // Bandera para verificar si la silla ha sido recorrida
+float sillaRecorrido = 0.0f; // Distancia recorrida por la silla
 
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 float vertices[] = {
@@ -169,9 +188,6 @@ int main()
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// GLFW Options
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
 	// Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
 	glewExperimental = GL_TRUE;
 	// Initialize GLEW to setup the OpenGL Function pointers
@@ -190,7 +206,7 @@ int main()
 	//Modelos exterior
 	//Model Casa((char*)"Models/casa.obj");
 	//Model Arbusto((char*)"Models/arbusto.fbx");
-	//Model Arbol((char*)"Models/arbol.obj");
+	Model Arbol((char*)"Models/arbol.obj");
 	//Model Farol((char*)"Models/faro.obj");
 	//Model Cesped((char*)"Models/cesped.obj");
 	//Model Cielo((char*)"Models/cieloo.obj");
@@ -199,7 +215,7 @@ int main()
 	//// Modelos interior cocina
 	//Model Pared_Cocina((char*)"Models/pared_cocina.obj");
 	//Model Pared_Cocina_Anterior((char*)"Models/pared_cocina_anterior.obj");
-	Model Piso((char*)"Models/piso_cocina.obj");
+	//Model Piso((char*)"Models/piso_cocina.obj");
 	//Model Puerta_Cocina((char*)"Models/puerta_cocina.obj");
 	//Model Ventana_Cocina((char*)"Models/ventana_cocina.obj");
 	//Model Pared_Madera((char*)"Models/pared_madera.obj");
@@ -218,11 +234,11 @@ int main()
 	//Model Buro((char*)"Models/buro.obj");
 	//Model Cajones((char*)"Models/cajones.obj");
 	//Model Cama((char*)"Models/cama.obj");
-	Model Pared_Habitacion((char*)"Models/pared_habitacion.obj");
+	//Model Pared_Habitacion((char*)"Models/pared_habitacion.obj");
 	//Model Television_Habitacion((char*)"Models/television_habitacion.obj");
-	Model Trampolin((char*)"Models/trampolin.obj");
-	Model Ventana_Habitacion((char*)"Models/ventana_habitacion.obj");
-	Model Rigby((char*)"Models/rigby.obj");
+	//Model Trampolin((char*)"Models/trampolin.obj");
+	//Model Ventana_Habitacion((char*)"Models/ventana_habitacion.obj");
+	//Model Rigby((char*)"Models/rigby.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -256,7 +272,7 @@ int main()
 		// Llamada a funciones de animacion
 		animateCircularDrift(deltaTime);
 		UpdateDayNightTransition(isNight, timeOfDay, deltaTime, 0.3);
-
+		windTime += deltaTime;
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
@@ -374,66 +390,51 @@ int main()
 		view = camera.GetViewMatrix();
 
 		/////////////////////////-Ambientacion-////////////////////////////////
-		//Arbusto central
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(58.0f, -10.0f, 20.0f));
-		//model = glm::scale(model, glm::vec3(18.0f, 20.0f, 18.0f));
-		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbusto.Draw(lightingShader);
-		////Arbusto izquierdo
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(45.0f, -10.0f, 22.0f));
-		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbusto.Draw(lightingShader);
-		////Arbusto derecho
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(75.0f, -10.0f, 21.0f));
-		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbusto.Draw(lightingShader);
-		////Arbusto derecho 2
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(85.0f, -10.0f, 21.0f));
-		//model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
-		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbusto.Draw(lightingShader);
-
-		////Arbol derecha
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(90.0f, -10.0f, -30.0f));
-		//model = glm::scale(model, glm::vec3(12.0f, 12.0f, 12.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbol.Draw(lightingShader);
-		////Arbol izquierda
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-90.0f, -10.0f, 30.0f));
-		//model = glm::scale(model, glm::vec3(12.0f, 12.0f, 12.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbol.Draw(lightingShader);
-		////Arbol 1
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-80.0f, -10.0f, -30.0f));
-		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbol.Draw(lightingShader);
-		////Arbol 2
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-150.0f, -10.0f, -70.0f));
-		//model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbol.Draw(lightingShader);
-		////Arbol 2
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-230.0f, -10.0f, -70.0f));
-		//model = glm::scale(model, glm::vec3(8.0f, 8.0f, 8.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Arbol.Draw(lightingShader);
-		//
+		//Arbustos
+		/*glm::vec3 arbustoPosiciones[] = {
+			glm::vec3(58.0f, -10.0f, 20.0f),
+			glm::vec3(45.0f, -10.0f, 22.0f),
+			glm::vec3(75.0f, -10.0f, 21.0f),
+			glm::vec3(85.0f, -10.0f, 21.0f)
+		};
+		glm::vec3 arbustoEscalas[] = {
+			glm::vec3(18.0f, 20.0f, 18.0f),
+			glm::vec3(10.0f, 10.0f, 10.0f),
+			glm::vec3(10.0f, 10.0f, 10.0f),
+			glm::vec3(8.0f, 8.0f, 8.0f)
+		};
+		for (int i = 0; i < sizeof(arbustoPosiciones) / sizeof(arbustoPosiciones[0]); ++i) {
+			model = glm::mat4(1);
+			model = glm::translate(model, arbustoPosiciones[i]);
+			model = glm::scale(model, arbustoEscalas[i]);
+			model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			Arbusto.Draw(lightingShader);
+		}*/
+		//Arboles
+		glm::vec3 arbolPosiciones[] = {
+			glm::vec3(90.0f, -10.0f, -30.0f),
+			glm::vec3(-90.0f, -10.0f, 30.0f),
+			glm::vec3(-80.0f, -10.0f, -30.0f),
+			glm::vec3(-150.0f, -10.0f, -70.0f),
+			glm::vec3(-230.0f, -10.0f, -70.0f)
+		};
+		glm::vec3 arbolEscalas[] = {
+			glm::vec3(12.0f, 12.0f, 12.0f),
+			glm::vec3(12.0f, 12.0f, 12.0f),
+			glm::vec3(10.0f, 10.0f, 10.0f),
+			glm::vec3(8.0f, 8.0f, 8.0f),
+			glm::vec3(8.0f, 8.0f, 8.0f)
+		};
+		for (int i = 0; i < sizeof(arbolPosiciones) / sizeof(arbolPosiciones[0]); ++i) {
+			model = glm::mat4(1);
+			model = glm::translate(model, arbolPosiciones[i]);
+			model = glm::scale(model, arbolEscalas[i]);
+			model = applyTreeWind(model, i * 0.5f); // Aplicar viento con un offset diferente para cada árbol
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			Arbol.Draw(lightingShader);
+		}
+		
 		////Faro
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(-17.0f, -10.0f, 80.0f));
@@ -566,43 +567,45 @@ int main()
 		//Pared_Madera.Draw(lightingShader);
 
 		////////////////////////////-Objetos-////////////////////////////////
-		//////Alacena 1
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-19.0f, 4.74f, -17.57f));
-		//model = glm::scale(model, glm::vec3(1.2f, 1.0f, 1.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Alacena.Draw(lightingShader);	
-		//////Alacena 2
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-21.1f, 4.74f, -14.0f));
-		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Alacena.Draw(lightingShader);
-		//////Alacena 3
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-19.0f, 4.74f, -10.5f));
-		//model = glm::scale(model, glm::vec3(1.2f, 1.0f, 1.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Alacena.Draw(lightingShader);
-		//////Alacena 4
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-17.1f, 4.74f, -14.0f));
-		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Alacena.Draw(lightingShader);
-		//////Alacena 5
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(-13.1f, 4.74f, -14.0f));
-		//model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Alacena.Draw(lightingShader);
-		////Alacena 6
+		////Alacenas
+		/*glm::vec3 alacenasPosiciones[] = {
+			glm::vec3(-19.0f, 4.74f, -17.57f),
+			glm::vec3(-21.1f, 4.74f, -14.0f),
+			glm::vec3(-19.0f, 4.74f, -10.5f),
+			glm::vec3(-17.1f, 4.74f, -14.0f),
+			glm::vec3(-13.1f, 4.74f, -14.0f),
+		};
+		glm::vec3 alacenasEscalas[] = {
+			glm::vec3(1.2f, 1.0f, 1.0f),
+			glm::vec3(1.2f, 1.0f, 1.0f),
+			glm::vec3(1.2f, 1.0f, 1.0f),
+			glm::vec3(1.2f, 1.0f, 1.0f),
+			glm::vec3(1.2f, 1.0f, 1.0f),
+		};
+		glm::vec3 alacenasRotaciones[] = {
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 270.0f, 0.0f),
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 270.0f, 0.0f),
+			glm::vec3(0.0f, 270.0f, 0.0f),
+		};
+		
+		for (int i = 0; i < sizeof(alacenasPosiciones) / sizeof(alacenasPosiciones[0]); ++i) {
+			model = glm::mat4(1);
+			model = glm::translate(model, alacenasPosiciones[i]);
+			model = glm::scale(model, alacenasEscalas[i]);
+			model = glm::rotate(model, glm::radians(alacenasRotaciones[i].y), glm::vec3(0.0f, 1.0f, 0.0f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			Alacena.Draw(lightingShader);
+		}*/
+
+		////Alacena Superior
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(-15.0f, 11.5f, -19.1f));
 		//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Alacena_Superior.Draw(lightingShader);
-		////Alacena 7
+		////Alacena Grande
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(-25.5f, 9.8f, -17.0f));
 		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
@@ -657,11 +660,11 @@ int main()
 		////////////////////////-Habitacion-////////////////////////////////
 		////////////////////////-Estructura-////////////////////////////////
 		//Piso
-		model = glm::mat4(1);
+		/*model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(3.0f, 25.4f, 0.2f));
 		model = glm::scale(model, glm::vec3(2.15f, 1.0f, 1.35f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso.Draw(lightingShader);
+		Piso.Draw(lightingShader);*/
 		//Techo
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(3.0f, 35.3f, 0.19f));
@@ -669,11 +672,11 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Piso.Draw(lightingShader);
 		////Pared posterior
-		model = glm::mat4(1);
+		/*model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(16.5f, 28.5f, -19.7f));
 		model = glm::scale(model, glm::vec3(3.2f, 3.2f, 1.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Pared_Habitacion.Draw(lightingShader);
+		Pared_Habitacion.Draw(lightingShader);*/
 		////Pared derecha
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(25.3f, 28.5f, -6.6f));
@@ -695,17 +698,17 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Pared_Habitacion.Draw(lightingShader);
 		//Ventana Habitacion 1
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(10.0f, 32.0f, -17.6f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Ventana_Habitacion.Draw(lightingShader);
-		//Ventana Habitacion 2
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(19.0f, 32.0f, -17.6f));
-		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Ventana_Habitacion.Draw(lightingShader);
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(10.0f, 32.0f, -17.6f));
+		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Ventana_Habitacion.Draw(lightingShader);
+		////Ventana Habitacion 2
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(19.0f, 32.0f, -17.6f));
+		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Ventana_Habitacion.Draw(lightingShader);
 
 
 		//////////////////////////-Objetos-////////////////////////////////
@@ -721,23 +724,23 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Buro.Draw(lightingShader);
 		// Trampolin
-		model = glm::mat4(1);
-		model = glm::translate(model, trampolinPos);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Trampolin.Draw(lightingShader);
-		// Trampolin Jump
-		updateTrampolineJump(deltaTime);
-		float jumpYOffset = jumpHeight * sin(jumpProgress * glm::pi<float>());
-		glm::vec3 rigbyPos = rigbyBasePos + glm::vec3(0.0f, jumpYOffset, 0.0f);
-		// Rigby
-		float squashY = 1.0f - (squashFactor * squashIntensity);
-		float stretchXZ = 1.0f + (squashFactor * squashIntensity * 0.5f); // Efecto secundario en X/Z
-		model = glm::mat4(1);
-		model = glm::translate(model, rigbyPos);
-		//model = glm::rotate(model, jumpProgress * glm::radians(360.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(rigbyScale * stretchXZ, rigbyScale * squashY, rigbyScale * stretchXZ));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Rigby.Draw(lightingShader);
+		//model = glm::mat4(1);
+		//model = glm::translate(model, trampolinPos);
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Trampolin.Draw(lightingShader);
+		//// Trampolin Jump
+		//updateTrampolineJump(deltaTime);
+		//float jumpYOffset = jumpHeight * sin(jumpProgress * glm::pi<float>());
+		//glm::vec3 rigbyPos = rigbyBasePos + glm::vec3(0.0f, jumpYOffset, 0.0f);
+		//// Rigby
+		//float squashY = 1.0f - (squashFactor * squashIntensity);
+		//float stretchXZ = 1.0f + (squashFactor * squashIntensity * 0.5f); // Efecto secundario en X/Z
+		//model = glm::mat4(1);
+		//model = glm::translate(model, rigbyPos);
+		////model = glm::rotate(model, jumpProgress * glm::radians(360.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(rigbyScale * stretchXZ, rigbyScale * squashY, rigbyScale * stretchXZ));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//Rigby.Draw(lightingShader);
 		////Archivero
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(22.2f, 28.4f, -10.0f));

@@ -20,10 +20,22 @@
 #include "Model.h"
 
 // Function prototypes
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+// Funciones de interaccion
+void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+
+// Funciones de animacion
 void animateCircularDrift(float deltaTime);
+void UpdateDayNightTransition(bool& isNight, float& timeOfDay, float deltaTime, float speed = 1.0f);
+template<typename T>
+T lerp(const T& a, const T& b, float t) {
+	return a + t * (b - a);
+}
+float smoothstep(float edge0, float edge1, float x) {
+	x = glm::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+	return x * x * (3.0f - 2.0f * x);
+}
 
 // Window dimensions
 //const GLuint WIDTH = 800, HEIGHT = 600;
@@ -43,17 +55,20 @@ bool firstMouse = true;
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 bool active;
-bool isNight = false; // Para determinar si es de noche o día
-float transitionSpeed = 1.0f; // Velocidad de transición de día a noche
-bool keyPressed = false; // Para almacenar el estado previo de la tecla N
+
+//Animacion de luces
+bool isNight = false;
+float timeOfDay = 0.0f; // 0.0 = di­a, 1.0 = noche
+float transitionSpeed = 1.0f;
+bool keyPressed = false;
 bool lightsOff = true;
-bool keyPressed2 = false; // Para almacenar el estado previo de la tecla L
+bool keyPressed2 = false;
 
 // Animacion carrito de golf
 float driftAngle = 0.0f;
-float circleRadius = 7.0f;  // Radio del círculo de drift
-float rotationSpeed = 2.0f; // Velocidad de rotación (radianes/segundo)
-glm::vec3 pivotPoint = glm::vec3(35.0f, -6.45f, 46.0f); // Punto de pivote (ruedas delanteras)
+float circleRadius = 7.0f;  // Radio del ci­rculo de drift
+float rotationSpeed = 2.0f; // Velocidad de rotacion (radianes/segundo)
+glm::vec3 pivotPoint = glm::vec3(35.0f, -6.52f, 46.0f); // Punto de pivote (ruedas delanteras)
 
 
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
@@ -101,7 +116,7 @@ float vertices[] = {
 	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
-glm::vec3 Light1 = glm::vec3(1.0f, 1.0f, 0.0f); 
+glm::vec3 Light1 = glm::vec3(1.0f, 1.0f, 0.0f);
 
 // Luces puntuales
 glm::vec3 pointLightPositions[] = {
@@ -214,7 +229,7 @@ int main()
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "material.specular"), 1);
 
-	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 350.0f);	
+	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 350.0f);
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -225,6 +240,8 @@ int main()
 		lastFrame = currentFrame;
 
 		animateCircularDrift(deltaTime);
+		// Funciona con o sin el cuarto argumento (por el valor predeterminado)
+		UpdateDayNightTransition(isNight, timeOfDay, deltaTime, 0.5);
 
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
@@ -246,58 +263,33 @@ int main()
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-		// Interpolación entre día y noche
-		float timeOfDay = isNight ? 1.0f : 0.0f; // 1.0f = noche, 0.0f = día
-		float lerpFactor = timeOfDay * transitionSpeed; // Factores de interpolación
+		// Luz direccional (sol/luna)
+		glm::vec3 dayLightDir(-0.2f, -1.0f, -0.3f);
+		glm::vec3 nightLightDir(0.2f, -1.0f, 0.3f); // Direccion diferente para la luna
+		glm::vec3 currentLightDir = lerp(dayLightDir, nightLightDir, timeOfDay);
 
-		// Lerp para la dirección de la luz
-		glm::vec3 dayLightDir(-0.2f, -1.0f, -0.3f); // Dirección de luz de día
-		glm::vec3 nightLightDir(-0.2f, -1.0f, -0.3f); // Dirección de luz de noche (podrías cambiarla si quieres)
-
-		// Lerp para la luz ambiental
-		glm::vec3 dayAmbient(0.5f, 0.5f, 0.5f); // Luz ambiental de día
-		glm::vec3 nightAmbient(0.1f, 0.1f, 0.3f); // Luz ambiental de noche (más azul)
-
-		// Lerp para la luz difusa
-		glm::vec3 dayDiffuse(0.8f, 0.8f, 0.8f); // Luz difusa de día
-		glm::vec3 nightDiffuse(0.2f, 0.2f, 0.5f); // Luz difusa de noche
-
-		// Lerp para la luz especular
-		glm::vec3 daySpecular(0.5f, 0.5f, 0.5f); // Luz especular de día
-		glm::vec3 nightSpecular(0.2f, 0.2f, 0.5f); // Luz especular de noche
-
-		// Lerp para la brillos del material
-		float dayShininess = 32.0f;
-		float nightShininess = 16.0f;
-
-		// Luz direccional
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"),
-			glm::mix(dayLightDir, nightLightDir, lerpFactor).x,
-			glm::mix(dayLightDir, nightLightDir, lerpFactor).y,
-			glm::mix(dayLightDir, nightLightDir, lerpFactor).z);
+			currentLightDir.x, currentLightDir.y, currentLightDir.z);
+
+		// Colores interpolados
+		float ambientFactor = smoothstep(0.2f, 0.8f, timeOfDay);
+		glm::vec3 currentAmbient = lerp(glm::vec3(0.5f), glm::vec3(0.15f), ambientFactor);
+		glm::vec3 currentDiffuse = lerp(glm::vec3(0.8f, 0.8f, 0.7f), glm::vec3(0.2f, 0.2f, 0.4f), timeOfDay);
+		glm::vec3 currentSpecular = lerp(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.1f, 0.1f, 0.2f), timeOfDay);
+		float currentShininess = lerp(32.0f, 16.0f, timeOfDay);
 
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"),
-			glm::mix(dayAmbient, nightAmbient, lerpFactor).x,
-			glm::mix(dayAmbient, nightAmbient, lerpFactor).y,
-			glm::mix(dayAmbient, nightAmbient, lerpFactor).z);
-
+			currentAmbient.x, currentAmbient.y, currentAmbient.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"),
-			glm::mix(dayDiffuse, nightDiffuse, lerpFactor).x,
-			glm::mix(dayDiffuse, nightDiffuse, lerpFactor).y,
-			glm::mix(dayDiffuse, nightDiffuse, lerpFactor).z);
-
+			currentDiffuse.x, currentDiffuse.y, currentDiffuse.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"),
-			glm::mix(daySpecular, nightSpecular, lerpFactor).x,
-			glm::mix(daySpecular, nightSpecular, lerpFactor).y,
-			glm::mix(daySpecular, nightSpecular, lerpFactor).z);
-
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"),
-			glm::mix(dayShininess, nightShininess, lerpFactor));
+			currentSpecular.x, currentSpecular.y, currentSpecular.z);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), lerp(32.0f, 64.0f, timeOfDay));
 
 
-		// Configuración de la luz puntual 1
+		// Configuracion de la luz puntual 1
 		float lightsOffFactor = lightsOff ? 0.0f : 1.0f; // Factor de luz apagada
-		float lerpFactor2 = lightsOff * 1.0f; // Factor de interpolación
+		float lerpFactor2 = lightsOff * 1.0f; // Factor de interpolacion
 
 		// Luz puntual 1
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"),
@@ -314,11 +306,11 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.09f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.032f);
 
-		// Configuración de la luz puntual 2
+		// Configuracion de la luz puntual 2
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"),
 			pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
 
-		// Color amarillento (más intenso en el componente rojo y verde, menos azul)
+		// Color amarillento (mas intenso en el componente rojo y verde, menos azul)
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"),
 			0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);  // Amarillo suave ambiental
 
@@ -328,21 +320,21 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"),
 			2.5f * lightsOffFactor, 2.2f * lightsOffFactor, 1.3f * lightsOffFactor);  // Amarillo especular
 
-		// Parámetros de atenuación para mayor alcance (valores más bajos = mayor alcance)
+		// Parametros de atenuacion para mayor alcance (valores mas bajos = mayor alcance)
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.05f);    // Reducido para mayor alcance
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.01f); // Reducido para mayor alcance
 
-		// Configuración de la luz puntual 3
+		// Configuracion de la luz puntual 3
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"),
 			pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-		// Color amarillento (más intenso en el componente rojo y verde, menos azul)
+		// Color amarillento (mas intenso en el componente rojo y verde, menos azul)
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"),
-			0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);  
+			0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"),
 			1.0f * lightsOffFactor, 0.8f * lightsOffFactor, 0.3f * lightsOffFactor);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"),
-			0.5f * lightsOffFactor, 0.4f * lightsOffFactor, 0.1f * lightsOffFactor);  
+			0.5f * lightsOffFactor, 0.4f * lightsOffFactor, 0.1f * lightsOffFactor);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.09f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.032f);
@@ -450,17 +442,17 @@ int main()
 		Cielo.Draw(lightingShader);
 
 		//Carrito de golf
-		// Calcular posición en el círculo
+		// Calcular posicion en el ci­rculo
 		float carPosX = pivotPoint.x + circleRadius * sin(driftAngle);
 		float carPosZ = pivotPoint.z + circleRadius * cos(driftAngle);
 
-		// Orientación del carrito (apuntando tangente al círculo)
-		float carRotation = driftAngle + glm::pi<float>() / 2; // 90° adicionales para orientación correcta
+		// Orientacion del carrito (apuntando tangente al ci­rculo)
+		float carRotation = driftAngle + glm::pi<float>() / 2; // 90Â° adicionales para orientacion correcta
 
 		// Aplicar transformaciones
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(carPosX, pivotPoint.y, carPosZ));
-		model = glm::rotate(model, carRotation, glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación en Y
+		model = glm::rotate(model, carRotation, glm::vec3(0.0f, 1.0f, 0.0f)); // Rotacion en Y
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Cart.Draw(lightingShader);
@@ -863,7 +855,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		}
 	}
 	if (keys[GLFW_KEY_N] && !keyPressed) {
-		isNight = !isNight; // Alterna entre noche y día
+		isNight = !isNight; // Alterna entre noche y di­a
 		keyPressed = true; // Marca que la tecla ha sido presionada
 	}
 	else if (!keys[GLFW_KEY_N]) {
@@ -871,7 +863,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	}
 
 	if (keys[GLFW_KEY_L] && !keyPressed) {
-		lightsOff = !lightsOff; // Alterna entre noche y día
+		lightsOff = !lightsOff; // Alterna entre noche y di­a
 		keyPressed2 = true; // Marca que la tecla ha sido presionada
 	}
 	else if (!keys[GLFW_KEY_L]) {
@@ -898,10 +890,21 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 }
 
 void animateCircularDrift(float deltaTime) {
-	driftAngle += rotationSpeed * deltaTime; // Aumenta el ángulo continuamente
+	driftAngle += rotationSpeed * deltaTime; // Aumenta el angulo continuamente
 
-	// Mantener el ángulo entre 0 y 2π para evitar overflow
+	// Mantener el angulo entre 0 y 2Ï€ para evitar overflow
 	if (driftAngle > 2 * glm::pi<float>()) {
 		driftAngle -= 2 * glm::pi<float>();
+	}
+}
+
+void UpdateDayNightTransition(bool& isNight, float& timeOfDay, float deltaTime, float speed) {
+	float target = isNight ? 1.0f : 0.0f;
+	float direction = (target > timeOfDay) ? 1.0f : -1.0f;
+	timeOfDay += direction * deltaTime * speed;
+
+	// Suavizado adicional cerca de los extremos
+	if ((direction > 0 && timeOfDay > 0.95f) || (direction < 0 && timeOfDay < 0.05f)) {
+		timeOfDay = target; // Fuerza el valor final sin oscilaciones
 	}
 }

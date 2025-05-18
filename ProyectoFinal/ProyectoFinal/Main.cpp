@@ -326,26 +326,26 @@ int main()
 		// Luz puntual 1
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.2f * lightsOffFactor, 0.2f * lightsOffFactor, 0.2f * lightsOffFactor);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), 1.0f * lightsOffFactor, 1.0f * lightsOffFactor, 1.0f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 1.0f * lightsOffFactor, 1.0f * lightsOffFactor, 1.0f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.5f * lightsOffFactor);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.09f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.032f);
 
 		// Luz puntual 2
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 4.0f * lightsOffFactor, 3.5f * lightsOffFactor, 2.0f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 5.0f * lightsOffFactor, 5.0f * lightsOffFactor, 5.0f * lightsOffFactor);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 2.5f * lightsOffFactor, 2.2f * lightsOffFactor, 1.3f * lightsOffFactor);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.05f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.5f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.02f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.01f);
 
 		// Luz puntual 3
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), 1.0f * lightsOffFactor, 0.8f * lightsOffFactor, 0.3f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), 0.5f * lightsOffFactor, 0.4f * lightsOffFactor, 0.1f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), 0.3f * lightsOffFactor, 0.3f * lightsOffFactor, 0.3f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), 0.2f * lightsOffFactor, 0.2f * lightsOffFactor, 0.2f * lightsOffFactor);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.032f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.1f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.04f);
 
 		// Create camera transformations
 		glm::mat4 view;
@@ -380,7 +380,7 @@ int main()
 			model = glm::translate(model, arbustoPosiciones[i]);
 			model = glm::scale(model, arbustoEscalas[i]);
 			model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			//model = applyTreeWind(model, i * 0.5f); // Aplicar viento con un offset diferente para cada arbusto
+			model = applyTreeWind(model, i * 0.5f); // Aplicar viento con un offset diferente para cada arbusto
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			Arbusto.Draw(lightingShader);
 		}
@@ -391,7 +391,7 @@ int main()
 			model = glm::mat4(1);
 			model = glm::translate(model, arbolPosiciones[i]);
 			model = glm::scale(model, arbolEscalas[i]);
-			//model = applyTreeWind(model, i * 0.5f); // Aplicar viento con un offset diferente para cada árbol
+			model = applyTreeWind(model, i * 0.5f); // Aplicar viento con un offset diferente para cada árbol
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			Arbol.Draw(lightingShader);
 		}

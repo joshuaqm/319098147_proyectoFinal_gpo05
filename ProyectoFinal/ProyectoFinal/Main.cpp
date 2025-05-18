@@ -156,6 +156,7 @@ int main()
 	Model Farol((char*)"Models/faro.obj");*/
 	Model Cesped((char*)"Models/cesped.obj");
 	Model Cielo((char*)"Models/cieloo.obj");
+	Model Cart((char*)"Models/cart.obj");
 
 	// Modelos interior cocina
 	Model Pared_Cocina((char*)"Models/pared_cocina.obj");
@@ -423,19 +424,26 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Farol.Draw(lightingShader);
 
-		////Cesped
+		//Cesped
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(-10.0f, -13.0f, 20.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Cesped.Draw(lightingShader);
 
-		////Cielo
+		//Cielo
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(-10.0f, -14.0f, 20.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Cielo.Draw(lightingShader);
+
+		//Carrito de Golf
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cart.Draw(lightingShader);
 
 		///////////////////////////-Fachada-////////////////////////////////
 		//Casa

@@ -183,6 +183,7 @@ int main()
 	Model Television_Habitacion((char*)"Models/television_habitacion.obj");
 	Model Trampolin((char*)"Models/trampolin.obj");
 	Model Ventana_Habitacion((char*)"Models/ventana_habitacion.obj");
+	Model Rigby((char*)"Models/rigby.fbx");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -690,6 +691,12 @@ int main()
 		model = glm::translate(model, glm::vec3(19.0f, 27.2f, -14.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Trampolin.Draw(lightingShader);
+		//Rigby
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(17.0f, 27.2f, -14.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Rigby.Draw(lightingShader);
 		//Archivero
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(22.2f, 28.4f, -10.0f));

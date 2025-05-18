@@ -36,6 +36,7 @@ float smoothstep(float edge0, float edge1, float x) {
 	x = glm::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
 	return x * x * (3.0f - 2.0f * x);
 }
+void updateTrampolineJump(float deltaTime);
 
 // Window dimensions
 //const GLuint WIDTH = 800, HEIGHT = 600;
@@ -59,16 +60,29 @@ bool active;
 //Animacion de luces
 bool isNight = false;
 float timeOfDay = 0.0f; // 0.0 = di­a, 1.0 = noche
-float transitionSpeed = 1.0f;
-bool keyPressed = false;
-bool lightsOff = true;
-bool keyPressed2 = false;
+float transitionSpeed = 1.0f; // Velocidad de transicion
+bool keyPressed = false; // Registra el estado de la tecla
+bool lightsOff = true; // Estado de las luces
+bool keyPressed2 = false; // Registra el estado de la tecla 2
 
 // Animacion carrito de golf
 float driftAngle = 0.0f;
 float circleRadius = 7.0f;  // Radio del ci­rculo de drift
 float rotationSpeed = 2.0f; // Velocidad de rotacion (radianes/segundo)
 glm::vec3 pivotPoint = glm::vec3(35.0f, -6.52f, 46.0f); // Punto de pivote (ruedas delanteras)
+
+// Animacion saltos
+glm::vec3 trampolinPos = glm::vec3(19.0f, 27.2f, -14.5f);  // Posición del trampolín
+glm::vec3 rigbyBasePos = glm::vec3(19.0f, 27.3f, -14.55f); // Posición base de Rigby
+float rigbyScale = 0.03f;                                  // Escala de Rigby
+
+// Parámetros del salto
+float jumpHeight = 1.5f;    // Altura del salto (ajusta según necesidad)
+float jumpSpeed = 1.2f;     // Velocidad del rebotea
+float jumpProgress = 0.0f;  // Progreso del salto (0 a 1)
+bool isAscending = true;    // Dirección del salto
+float squashFactor = 0.0f;  // Controla la compresión (0 = normal, 1 = máximo squash)
+float squashIntensity = 0.1f; // Qué tanto se comprime (20% de su escala original)
 
 
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
@@ -204,11 +218,11 @@ int main()
 	//Model Buro((char*)"Models/buro.obj");
 	//Model Cajones((char*)"Models/cajones.obj");
 	//Model Cama((char*)"Models/cama.obj");
-	//Model Pared_Habitacion((char*)"Models/pared_habitacion.obj");
+	Model Pared_Habitacion((char*)"Models/pared_habitacion.obj");
 	//Model Television_Habitacion((char*)"Models/television_habitacion.obj");
 	Model Trampolin((char*)"Models/trampolin.obj");
-	//Model Ventana_Habitacion((char*)"Models/ventana_habitacion.obj");
-	Model Rigby((char*)"Models/rigby.fbx");
+	Model Ventana_Habitacion((char*)"Models/ventana_habitacion.obj");
+	Model Rigby((char*)"Models/rigby.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -239,8 +253,8 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// Llamada a funciones de animacion
 		animateCircularDrift(deltaTime);
-		// Funciona con o sin el cuarto argumento (por el valor predeterminado)
 		UpdateDayNightTransition(isNight, timeOfDay, deltaTime, 0.3);
 
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
@@ -655,11 +669,11 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Piso.Draw(lightingShader);
 		////Pared posterior
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(16.5f, 28.5f, -19.7f));
-		//model = glm::scale(model, glm::vec3(3.2f, 3.2f, 1.5f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Pared_Habitacion.Draw(lightingShader);
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(16.5f, 28.5f, -19.7f));
+		model = glm::scale(model, glm::vec3(3.2f, 3.2f, 1.5f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Pared_Habitacion.Draw(lightingShader);
 		////Pared derecha
 		//model = glm::mat4(1);
 		//model = glm::translate(model, glm::vec3(25.3f, 28.5f, -6.6f));
@@ -680,18 +694,18 @@ int main()
 		//model = glm::scale(model, glm::vec3(3.2f, 3.2f, 1.5f));
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Pared_Habitacion.Draw(lightingShader);
-		////Ventana Habitacion 1
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(10.0f, 32.0f, -17.6f));
-		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Ventana_Habitacion.Draw(lightingShader);
-		////Ventana Habitacion 2
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(19.0f, 32.0f, -17.6f));
-		//model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//Ventana_Habitacion.Draw(lightingShader);
+		//Ventana Habitacion 1
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(10.0f, 32.0f, -17.6f));
+		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Ventana_Habitacion.Draw(lightingShader);
+		//Ventana Habitacion 2
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(19.0f, 32.0f, -17.6f));
+		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Ventana_Habitacion.Draw(lightingShader);
 
 
 		//////////////////////////-Objetos-////////////////////////////////
@@ -706,15 +720,22 @@ int main()
 		//model = glm::scale(model, glm::vec3(1.3f, 1.3f, 1.3f));
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		//Buro.Draw(lightingShader);
-		//Trampolin
+		// Trampolin
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(19.0f, 27.2f, -14.5f));
+		model = glm::translate(model, trampolinPos);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Trampolin.Draw(lightingShader);
-		//Rigby
+		// Trampolin Jump
+		updateTrampolineJump(deltaTime);
+		float jumpYOffset = jumpHeight * sin(jumpProgress * glm::pi<float>());
+		glm::vec3 rigbyPos = rigbyBasePos + glm::vec3(0.0f, jumpYOffset, 0.0f);
+		// Rigby
+		float squashY = 1.0f - (squashFactor * squashIntensity);
+		float stretchXZ = 1.0f + (squashFactor * squashIntensity * 0.5f); // Efecto secundario en X/Z
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(17.0f, 27.2f, -14.0f));
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::translate(model, rigbyPos);
+		//model = glm::rotate(model, jumpProgress * glm::radians(360.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(rigbyScale * stretchXZ, rigbyScale * squashY, rigbyScale * stretchXZ));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Rigby.Draw(lightingShader);
 		////Archivero
@@ -903,5 +924,26 @@ void UpdateDayNightTransition(bool& isNight, float& timeOfDay, float deltaTime, 
 	// Suavizado adicional cerca de los extremos
 	if ((direction > 0 && timeOfDay > 0.95f) || (direction < 0 && timeOfDay < 0.05f)) {
 		timeOfDay = target; // Fuerza el valor final sin oscilaciones
+	}
+}
+
+void updateTrampolineJump(float deltaTime) {
+	if (isAscending) {
+		jumpProgress += jumpSpeed * deltaTime;
+		if (jumpProgress >= 1.0f) {
+			jumpProgress = 1.0f;
+			isAscending = false;
+		}
+		// Squash disminuye durante el ascenso
+		squashFactor = 1.0f - jumpProgress;
+	}
+	else {
+		jumpProgress -= jumpSpeed * deltaTime;
+		if (jumpProgress <= 0.0f) {
+			jumpProgress = 0.0f;
+			isAscending = true;
+		}
+		// Squash aumenta durante el descenso
+		squashFactor = jumpProgress;
 	}
 }

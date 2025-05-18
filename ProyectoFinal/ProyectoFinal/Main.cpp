@@ -1,4 +1,4 @@
-#include <iostream>
+Ôªø#include <iostream>
 #include <cmath>
 // GLEW
 #include <GL/glew.h>
@@ -23,6 +23,7 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+void animateCircularDrift(float deltaTime);
 
 // Window dimensions
 //const GLuint WIDTH = 800, HEIGHT = 600;
@@ -30,22 +31,30 @@ const GLuint WIDTH = 1280, HEIGHT = 720;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-//Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
-Camera  camera(glm::vec3(0.0f, 35.0f, 0.0f));
+Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
+//Camera  camera(glm::vec3(0.0f, 35.0f, 0.0f));
 
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
 bool firstMouse = true;
 
+// Variables globales
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 bool active;
-bool isNight = false; // Para determinar si es de noche o dÌa
-float transitionSpeed = 1.0f; // Velocidad de transiciÛn de dÌa a noche
+bool isNight = false; // Para determinar si es de noche o d√≠a
+float transitionSpeed = 1.0f; // Velocidad de transici√≥n de d√≠a a noche
 bool keyPressed = false; // Para almacenar el estado previo de la tecla N
 bool lightsOff = true;
 bool keyPressed2 = false; // Para almacenar el estado previo de la tecla L
+
+// Animacion carrito de golf
+float driftAngle = 0.0f;
+float circleRadius = 7.0f;  // Radio del c√≠rculo de drift
+float rotationSpeed = 2.0f; // Velocidad de rotaci√≥n (radianes/segundo)
+glm::vec3 pivotPoint = glm::vec3(35.0f, -6.45f, 46.0f); // Punto de pivote (ruedas delanteras)
+
 
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 float vertices[] = {
@@ -215,6 +224,8 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		animateCircularDrift(deltaTime);
+
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
@@ -235,24 +246,24 @@ int main()
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-		// InterpolaciÛn entre dÌa y noche
-		float timeOfDay = isNight ? 1.0f : 0.0f; // 1.0f = noche, 0.0f = dÌa
-		float lerpFactor = timeOfDay * transitionSpeed; // Factores de interpolaciÛn
+		// Interpolaci√≥n entre d√≠a y noche
+		float timeOfDay = isNight ? 1.0f : 0.0f; // 1.0f = noche, 0.0f = d√≠a
+		float lerpFactor = timeOfDay * transitionSpeed; // Factores de interpolaci√≥n
 
-		// Lerp para la direcciÛn de la luz
-		glm::vec3 dayLightDir(-0.2f, -1.0f, -0.3f); // DirecciÛn de luz de dÌa
-		glm::vec3 nightLightDir(-0.2f, -1.0f, -0.3f); // DirecciÛn de luz de noche (podrÌas cambiarla si quieres)
+		// Lerp para la direcci√≥n de la luz
+		glm::vec3 dayLightDir(-0.2f, -1.0f, -0.3f); // Direcci√≥n de luz de d√≠a
+		glm::vec3 nightLightDir(-0.2f, -1.0f, -0.3f); // Direcci√≥n de luz de noche (podr√≠as cambiarla si quieres)
 
 		// Lerp para la luz ambiental
-		glm::vec3 dayAmbient(0.5f, 0.5f, 0.5f); // Luz ambiental de dÌa
-		glm::vec3 nightAmbient(0.1f, 0.1f, 0.3f); // Luz ambiental de noche (m·s azul)
+		glm::vec3 dayAmbient(0.5f, 0.5f, 0.5f); // Luz ambiental de d√≠a
+		glm::vec3 nightAmbient(0.1f, 0.1f, 0.3f); // Luz ambiental de noche (m√°s azul)
 
 		// Lerp para la luz difusa
-		glm::vec3 dayDiffuse(0.8f, 0.8f, 0.8f); // Luz difusa de dÌa
+		glm::vec3 dayDiffuse(0.8f, 0.8f, 0.8f); // Luz difusa de d√≠a
 		glm::vec3 nightDiffuse(0.2f, 0.2f, 0.5f); // Luz difusa de noche
 
 		// Lerp para la luz especular
-		glm::vec3 daySpecular(0.5f, 0.5f, 0.5f); // Luz especular de dÌa
+		glm::vec3 daySpecular(0.5f, 0.5f, 0.5f); // Luz especular de d√≠a
 		glm::vec3 nightSpecular(0.2f, 0.2f, 0.5f); // Luz especular de noche
 
 		// Lerp para la brillos del material
@@ -284,9 +295,9 @@ int main()
 			glm::mix(dayShininess, nightShininess, lerpFactor));
 
 
-		// ConfiguraciÛn de la luz puntual 1
+		// Configuraci√≥n de la luz puntual 1
 		float lightsOffFactor = lightsOff ? 0.0f : 1.0f; // Factor de luz apagada
-		float lerpFactor2 = lightsOff * 1.0f; // Factor de interpolaciÛn
+		float lerpFactor2 = lightsOff * 1.0f; // Factor de interpolaci√≥n
 
 		// Luz puntual 1
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"),
@@ -303,11 +314,11 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.09f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.032f);
 
-		// ConfiguraciÛn de la luz puntual 2
+		// Configuraci√≥n de la luz puntual 2
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"),
 			pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
 
-		// Color amarillento (m·s intenso en el componente rojo y verde, menos azul)
+		// Color amarillento (m√°s intenso en el componente rojo y verde, menos azul)
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"),
 			0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);  // Amarillo suave ambiental
 
@@ -317,15 +328,15 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"),
 			2.5f * lightsOffFactor, 2.2f * lightsOffFactor, 1.3f * lightsOffFactor);  // Amarillo especular
 
-		// Par·metros de atenuaciÛn para mayor alcance (valores m·s bajos = mayor alcance)
+		// Par√°metros de atenuaci√≥n para mayor alcance (valores m√°s bajos = mayor alcance)
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.05f);    // Reducido para mayor alcance
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.01f); // Reducido para mayor alcance
 
-		// ConfiguraciÛn de la luz puntual 3
+		// Configuraci√≥n de la luz puntual 3
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"),
 			pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-		// Color amarillento (m·s intenso en el componente rojo y verde, menos azul)
+		// Color amarillento (m√°s intenso en el componente rojo y verde, menos azul)
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"),
 			0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);  
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"),
@@ -438,10 +449,19 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Cielo.Draw(lightingShader);
 
-		//Carrito de Golf
+		//Carrito de golf
+		// Calcular posici√≥n en el c√≠rculo
+		float carPosX = pivotPoint.x + circleRadius * sin(driftAngle);
+		float carPosZ = pivotPoint.z + circleRadius * cos(driftAngle);
+
+		// Orientaci√≥n del carrito (apuntando tangente al c√≠rculo)
+		float carRotation = driftAngle + glm::pi<float>() / 2; // 90¬∞ adicionales para orientaci√≥n correcta
+
+		// Aplicar transformaciones
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::translate(model, glm::vec3(carPosX, pivotPoint.y, carPosZ));
+		model = glm::rotate(model, carRotation, glm::vec3(0.0f, 1.0f, 0.0f)); // Rotaci√≥n en Y
+		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Cart.Draw(lightingShader);
 
@@ -843,7 +863,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		}
 	}
 	if (keys[GLFW_KEY_N] && !keyPressed) {
-		isNight = !isNight; // Alterna entre noche y dÌa
+		isNight = !isNight; // Alterna entre noche y d√≠a
 		keyPressed = true; // Marca que la tecla ha sido presionada
 	}
 	else if (!keys[GLFW_KEY_N]) {
@@ -851,7 +871,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	}
 
 	if (keys[GLFW_KEY_L] && !keyPressed) {
-		lightsOff = !lightsOff; // Alterna entre noche y dÌa
+		lightsOff = !lightsOff; // Alterna entre noche y d√≠a
 		keyPressed2 = true; // Marca que la tecla ha sido presionada
 	}
 	else if (!keys[GLFW_KEY_L]) {
@@ -875,4 +895,13 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 	lastY = yPos;
 
 	camera.ProcessMouseMovement(xOffset, yOffset);
+}
+
+void animateCircularDrift(float deltaTime) {
+	driftAngle += rotationSpeed * deltaTime; // Aumenta el √°ngulo continuamente
+
+	// Mantener el √°ngulo entre 0 y 2œÄ para evitar overflow
+	if (driftAngle > 2 * glm::pi<float>()) {
+		driftAngle -= 2 * glm::pi<float>();
+	}
 }

@@ -27,7 +27,8 @@ void DoMovement();
 
 // Funciones de animacion
 void animateCircularDrift(float deltaTime);
-void UpdateDayNightTransition(bool& isNight, float& timeOfDay, float deltaTime, float speed = 1.0f);
+void UpdateDayNightTransition(float deltaTime);
+;
 template<typename T>
 T lerp(const T& a, const T& b, float t) {
 	return a + t * (b - a);
@@ -60,9 +61,9 @@ bool active;
 
 //Animacion de luces
 bool isNight = false;
-float timeOfDay = 0.0f; // 0.0 = di­a, 1.0 = noche
-float transitionSpeed = 1.0f; // Velocidad de transicion
-bool keyPressed = false; // Registra el estado de la tecla
+float timeOfDay = 0.0f;
+float transitionSpeed = 0.25f;  
+bool transitionActive = false;
 bool lightsOff = true; // Estado de las luces
 bool keyPressed2 = false; // Registra el estado de la tecla 2
 
@@ -271,7 +272,7 @@ int main()
 
 		// Llamada a funciones de animacion
 		animateCircularDrift(deltaTime);
-		UpdateDayNightTransition(isNight, timeOfDay, deltaTime, 0.3);
+		UpdateDayNightTransition(deltaTime);
 		windTime += deltaTime;
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
@@ -293,82 +294,58 @@ int main()
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-		// Luz direccional (sol/luna)
+		// Interpolación progresiva basada en timeOfDay
+		float ambientFactor = glm::smoothstep(0.0f, 1.0f, timeOfDay);
+
 		glm::vec3 dayLightDir(-0.2f, -1.0f, -0.3f);
-		glm::vec3 nightLightDir(0.2f, -1.0f, 0.3f); // Direccion diferente para la luna
-		glm::vec3 currentLightDir = lerp(dayLightDir, nightLightDir, timeOfDay);
+		glm::vec3 nightLightDir(0.2f, -1.0f, 0.3f);
+		glm::vec3 currentLightDir = glm::normalize(glm::mix(dayLightDir, nightLightDir, ambientFactor));
 
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"),
 			currentLightDir.x, currentLightDir.y, currentLightDir.z);
 
-		// Colores interpolados
-		float ambientFactor = smoothstep(0.2f, 0.8f, timeOfDay);
-		glm::vec3 currentAmbient = lerp(glm::vec3(0.5f), glm::vec3(0.15f), ambientFactor);
-		glm::vec3 currentDiffuse = lerp(glm::vec3(0.8f, 0.8f, 0.7f), glm::vec3(0.2f, 0.2f, 0.4f), timeOfDay);
-		glm::vec3 currentSpecular = lerp(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.1f, 0.1f, 0.2f), timeOfDay);
-		float currentShininess = lerp(32.0f, 16.0f, timeOfDay);
+		glm::vec3 currentAmbient = glm::mix(glm::vec3(0.5f), glm::vec3(0.05f, 0.05f, 0.15f), ambientFactor);
+		glm::vec3 currentDiffuse = glm::mix(glm::vec3(0.8f, 0.8f, 0.7f), glm::vec3(0.1f, 0.1f, 0.25f), ambientFactor);
+		glm::vec3 currentSpecular = glm::mix(glm::vec3(0.5f), glm::vec3(0.1f, 0.1f, 0.2f), ambientFactor);
 
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"),
-			currentAmbient.x, currentAmbient.y, currentAmbient.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"),
-			currentDiffuse.x, currentDiffuse.y, currentDiffuse.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"),
-			currentSpecular.x, currentSpecular.y, currentSpecular.z);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), lerp(32.0f, 64.0f, timeOfDay));
+		float currentShininess = glm::mix(32.0f, 64.0f, ambientFactor);
 
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), currentAmbient.x, currentAmbient.y, currentAmbient.z);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), currentDiffuse.x, currentDiffuse.y, currentDiffuse.z);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), currentSpecular.x, currentSpecular.y, currentSpecular.z);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), currentShininess);
 
-		// Configuracion de la luz puntual 1
-		float lightsOffFactor = lightsOff ? 0.0f : 1.0f; // Factor de luz apagada
-		float lerpFactor2 = lightsOff * 1.0f; // Factor de interpolacion
+		// Luces puntuales: se mantienen, activadas o no según lightsOff
+		float lightsOffFactor = lightsOff ? 0.0f : 1.0f;
+
+		for (int i = 0; i < 3; ++i) {
+			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + std::to_string(i) + "].position").c_str()),
+				pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
+		}
 
 		// Luz puntual 1
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"),
-			pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"),
-			0.2f * lightsOffFactor, 0.2f * lightsOffFactor, 0.2f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"),
-			1.0f * lightsOffFactor, 1.0f * lightsOffFactor, 1.0f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"),
-			1.0f * lightsOffFactor, 1.0f * lightsOffFactor, 1.0f * lightsOffFactor);
-
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.2f * lightsOffFactor, 0.2f * lightsOffFactor, 0.2f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), 1.0f * lightsOffFactor, 1.0f * lightsOffFactor, 1.0f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 1.0f * lightsOffFactor, 1.0f * lightsOffFactor, 1.0f * lightsOffFactor);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.09f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.032f);
 
-		// Configuracion de la luz puntual 2
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"),
-			pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
-
-		// Color amarillento (mas intenso en el componente rojo y verde, menos azul)
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"),
-			0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);  // Amarillo suave ambiental
-
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"),
-			4.0f * lightsOffFactor, 3.5f * lightsOffFactor, 2.0f * lightsOffFactor);  // Amarillo brillante difuso
-
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"),
-			2.5f * lightsOffFactor, 2.2f * lightsOffFactor, 1.3f * lightsOffFactor);  // Amarillo especular
-
-		// Parametros de atenuacion para mayor alcance (valores mas bajos = mayor alcance)
+		// Luz puntual 2
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 4.0f * lightsOffFactor, 3.5f * lightsOffFactor, 2.0f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 2.5f * lightsOffFactor, 2.2f * lightsOffFactor, 1.3f * lightsOffFactor);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.05f);    // Reducido para mayor alcance
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.01f); // Reducido para mayor alcance
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.05f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.01f);
 
-		// Configuracion de la luz puntual 3
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"),
-			pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-		// Color amarillento (mas intenso en el componente rojo y verde, menos azul)
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"),
-			0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"),
-			1.0f * lightsOffFactor, 0.8f * lightsOffFactor, 0.3f * lightsOffFactor);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"),
-			0.5f * lightsOffFactor, 0.4f * lightsOffFactor, 0.1f * lightsOffFactor);
+		// Luz puntual 3
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.5f * lightsOffFactor, 0.5f * lightsOffFactor, 0.1f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), 1.0f * lightsOffFactor, 0.8f * lightsOffFactor, 0.3f * lightsOffFactor);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), 0.5f * lightsOffFactor, 0.4f * lightsOffFactor, 0.1f * lightsOffFactor);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.09f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.032f);
-
 
 		// Create camera transformations
 		glm::mat4 view;
@@ -798,20 +775,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 			keys[key] = false;
 		}
 	}
-	if (keys[GLFW_KEY_N] && !keyPressed) {
-		isNight = !isNight; // Alterna entre noche y di­a
-		keyPressed = true; // Marca que la tecla ha sido presionada
-	}
-	else if (!keys[GLFW_KEY_N]) {
-		keyPressed = false; // Si la tecla se ha soltado, resetea el estado
+	if (key == GLFW_KEY_N && action == GLFW_PRESS) {
+		isNight = !isNight;
+		transitionActive = true; // inicia la animación
 	}
 
-	if (keys[GLFW_KEY_L] && !keyPressed) {
-		lightsOff = !lightsOff; // Alterna entre noche y di­a
-		keyPressed2 = true; // Marca que la tecla ha sido presionada
+
+	if (keys[GLFW_KEY_L] && !keyPressed2) {
+		lightsOff = !lightsOff;
+		keyPressed2 = true;
 	}
 	else if (!keys[GLFW_KEY_L]) {
-		keyPressed2 = false; // Si la tecla se ha soltado, resetea el estado
+		keyPressed2 = false; 
 	}
 }
 
@@ -842,16 +817,21 @@ void animateCircularDrift(float deltaTime) {
 	}
 }
 
-void UpdateDayNightTransition(bool& isNight, float& timeOfDay, float deltaTime, float speed) {
+void UpdateDayNightTransition(float deltaTime) {
+	if (!transitionActive) return;
+
 	float target = isNight ? 1.0f : 0.0f;
 	float direction = (target > timeOfDay) ? 1.0f : -1.0f;
-	timeOfDay += direction * deltaTime * speed;
 
-	// Suavizado adicional cerca de los extremos
-	if ((direction > 0 && timeOfDay > 0.95f) || (direction < 0 && timeOfDay < 0.05f)) {
-		timeOfDay = target; // Fuerza el valor final sin oscilaciones
+	timeOfDay += direction * deltaTime * transitionSpeed;
+
+	// Clamp y finalización
+	if ((direction > 0.0f && timeOfDay >= target) || (direction < 0.0f && timeOfDay <= target)) {
+		timeOfDay = target;
+		transitionActive = false;  // transición terminada
 	}
 }
+
 
 void updateTrampolineJump(float deltaTime) {
 	if (isAscending) {

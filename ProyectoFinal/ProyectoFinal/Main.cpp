@@ -213,6 +213,9 @@ int main()
 	Model Cielo((char*)"Models/cieloo.obj");
 	Model Cart((char*)"Models/cart.obj");
 
+	// Modelos segundo piso
+	Model Escaleras_Interior((char*)"Models/escaleras_interior.obj");
+
 	// Modelos interior cocina
 	Model Pared_Cocina((char*)"Models/pared_cocina.obj");
 	Model Pared_Cocina_Anterior((char*)"Models/pared_cocina_anterior.obj");
@@ -451,6 +454,11 @@ int main()
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			Piso.Draw(lightingShader);
 		}
+		//Escaleras
+		model = glm::mat4(1);
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Escaleras_Interior.Draw(lightingShader);
 		
 		////////////////////////-Cocina-////////////////////////////////
 		////////////////////////-Estructura-////////////////////////////////
@@ -579,6 +587,9 @@ int main()
 		model = glm::rotate(model, glm::radians(315.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Tostadora.Draw(lightingShader);
+
+		// Segundo piso
+
 
 		//////////////////////-Habitacion-////////////////////////////////
 		//////////////////////-Estructura-////////////////////////////////

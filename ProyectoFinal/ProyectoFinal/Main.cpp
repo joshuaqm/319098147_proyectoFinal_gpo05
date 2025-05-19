@@ -46,8 +46,8 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
-//Camera  camera(glm::vec3(0.0f, 35.0f, 0.0f));
+//Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
+Camera  camera(glm::vec3(-8.0f, 10.0f, 0.0f));
 
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
@@ -442,14 +442,14 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Casa.Draw(lightingShader);
 		//Pisos y techos
-		//Piso, techo, piso cocina, techo cocina, piso habitacion, techo habitacion, piso segundo piso
-		glm::vec3 pisosPosicion[] = { glm::vec3(-3.0f, 5.55f, 3.0f), glm::vec3(3.75f, 13.65f, 2.65f), glm::vec3(-10.2f, 4.1f, -12.7f), 
-			glm::vec3(-10.2f, 13.0f, -12.7f), glm::vec3(3.0f, 25.4f, 0.2f), glm::vec3(3.0f, 35.3f, 0.19f), glm::vec3(3.0f, 15.5f, 0.2f) };
-		glm::vec3 pisosEscala[] = {glm::vec3(2.7f, 1.0f, 1.9f), glm::vec3(2.55f, 1.0f, 1.75f), glm::vec3(1.28f, 1.0f, 0.84f), 
-			glm::vec3(1.28f, 1.0f, 0.84f), glm::vec3(2.15f, 1.0f, 1.35f), glm::vec3(2.155f, 1.0f, 1.36f), glm::vec3(2.15f, 1.0f, 1.35f) };
-		float radianes[] = {180.0f, 0.0f, 90.0f, 90.0f, 0.0f, 0.0f, 0.0f};
+		//Piso, techo, piso cocina, techo cocina, piso habitacion, techo habitacion
+		glm::vec3 pisosPosicion[] = { glm::vec3(-3.0f, 5.55f, 3.0f), glm::vec3(-2.0f, 11.2f, 2.65f), glm::vec3(-10.2f, 4.1f, -12.7f),
+			glm::vec3(-10.2f, 13.0f, -12.7f), glm::vec3(6.8f, 25.4f, 0.2f), glm::vec3(3.0f, 35.3f, 0.19f)};
+		glm::vec3 pisosEscala[] = {glm::vec3(2.7f, 1.0f, 1.9f), glm::vec3(2.1f, 5.5f, 1.75f), glm::vec3(1.28f, 1.0f, 0.84f), 
+			glm::vec3(1.28f, 1.0f, 0.84f), glm::vec3(1.75f, 1.0f, 1.35f), glm::vec3(2.155f, 1.0f, 1.36f) };
+		float radianes[] = {180.0f, 0.0f, 90.0f, 90.0f, 0.0f, 0.0f};
 		glm::vec3 pisosRotacion[] = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),	
-			glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
+			glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
 		for (int i = 0; i < sizeof(pisosPosicion) / sizeof(pisosPosicion[0]); ++i) {
 			model = glm::mat4(1);
 			model = glm::translate(model, pisosPosicion[i]);
@@ -458,9 +458,18 @@ int main()
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			Piso.Draw(lightingShader);
 		}
-		//Escaleras
+		//Escaleras inferior
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(0.0f, 3.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(5.9f, 3.5f, -5.1f));
+		model = glm::scale(model, glm::vec3(1.3f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Escaleras_Interior.Draw(lightingShader);
+
+		// Escaleras superior
+		model = glm::mat4(1);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.2f));
+		model = glm::translate(model, glm::vec3(2.0f, 12.5f, 2.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Escaleras_Interior.Draw(lightingShader);
 		
@@ -613,7 +622,7 @@ int main()
 		}
 		//Con puerta
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(3.8f, 30.4f, -9.3f));
+		model = glm::translate(model, glm::vec3(3.9f, 30.4f, -9.3f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));

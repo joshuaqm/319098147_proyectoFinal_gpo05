@@ -46,8 +46,8 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-//Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
-Camera  camera(glm::vec3(-8.0f, 10.0f, 0.0f));
+Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
+//Camera  camera(glm::vec3(-8.0f, 10.0f, 0.0f));
 
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
@@ -101,9 +101,39 @@ glm::mat4 applyTreeWind(glm::mat4 model, float offset) {
 	return model;
 }
 
-// Animacion sillas
-bool sillaRecorrida = false; // Bandera para verificar si la silla ha sido recorrida
-float sillaRecorrido = 0.0f; // Distancia recorrida por la silla
+// Linterna/Spotlight
+bool flashlightOn = true;
+bool keyPressed3 = false; // Para controlar el estado de la tecla "1"
+
+// Parámetros del spotlight
+struct Spotlight {
+	glm::vec3 position;
+	glm::vec3 direction;
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+	float cutOff;
+	float outerCutOff;
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+Spotlight flashlight = {
+	glm::vec3(0.0f),                  
+	glm::vec3(0.0f),                  
+	glm::vec3(0.2f),                 
+	glm::vec3(1.5f, 1.5f, 1.3f),    
+	glm::vec3(2.0f),                 
+	glm::cos(glm::radians(20.0f)),   
+	glm::cos(glm::radians(30.0f)),   
+	1.0f,                           
+	0.05f,                          
+	0.008f                          
+};
+
+void UpdateFlashlight(Camera& camera, Spotlight& flashlight);
+
 
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 float vertices[] = {
@@ -350,6 +380,41 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.1f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.04f);
+
+		// Spotlight
+		// Actualiza la posición de la linterna
+		UpdateFlashlight(camera, flashlight);
+
+		// Configura el spotlight en el shader
+		if (flashlightOn) {
+			std::string base = "spotLight.";
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "position").c_str()),
+				flashlight.position.x, flashlight.position.y, flashlight.position.z);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "direction").c_str()),
+				flashlight.direction.x, flashlight.direction.y, flashlight.direction.z);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "ambient").c_str()),
+				flashlight.ambient.x, flashlight.ambient.y, flashlight.ambient.z);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "diffuse").c_str()),
+				flashlight.diffuse.x, flashlight.diffuse.y, flashlight.diffuse.z);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "specular").c_str()),
+				flashlight.specular.x, flashlight.specular.y, flashlight.specular.z);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "cutOff").c_str()),
+				flashlight.cutOff);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "outerCutOff").c_str()),
+				flashlight.outerCutOff);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "constant").c_str()),
+				flashlight.constant);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "linear").c_str()),
+				flashlight.linear);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "quadratic").c_str()),
+				flashlight.quadratic);
+		}
+		else {
+			// Apaga la linterna configurando intensidad cero
+			std::string base = "spotLight.";
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "diffuse").c_str()), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "specular").c_str()), 0.0f, 0.0f, 0.0f);
+		}
 
 		// Create camera transformations
 		glm::mat4 view;
@@ -819,6 +884,14 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	else if (!keys[GLFW_KEY_L]) {
 		keyPressed2 = false; 
 	}
+
+	if (keys[GLFW_KEY_1] && !keyPressed3) {
+		flashlightOn = !flashlightOn;
+		keyPressed3 = true;
+	}
+	else if (!keys[GLFW_KEY_1]) {
+		keyPressed3 = false;
+	}
 }
 
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
@@ -883,4 +956,9 @@ void updateTrampolineJump(float deltaTime) {
 		// Squash aumenta durante el descenso
 		squashFactor = jumpProgress;
 	}
+}
+
+void UpdateFlashlight(Camera& camera, Spotlight& flashlight) {
+	flashlight.position = camera.GetPosition();
+	flashlight.direction = camera.GetFront();
 }

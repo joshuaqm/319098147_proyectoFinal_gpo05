@@ -125,7 +125,7 @@ Spotlight flashlight = {
 	glm::vec3(0.2f),                 
 	glm::vec3(1.5f, 1.5f, 1.3f),    
 	glm::vec3(2.0f),                 
-	glm::cos(glm::radians(20.0f)),   
+	glm::cos(glm::radians(16.0f)),   
 	glm::cos(glm::radians(30.0f)),   
 	1.0f,                           
 	0.05f,                          
@@ -410,10 +410,18 @@ int main()
 				flashlight.quadratic);
 		}
 		else {
-			// Apaga la linterna configurando intensidad cero
+			// Apaga completamente la linterna: todos los componentes a cero
 			std::string base = "spotLight.";
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "position").c_str()), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "direction").c_str()), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "ambient").c_str()), 0.0f, 0.0f, 0.0f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "diffuse").c_str()), 0.0f, 0.0f, 0.0f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "specular").c_str()), 0.0f, 0.0f, 0.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "cutOff").c_str()), 0.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "outerCutOff").c_str()), 0.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "constant").c_str()), 1.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "linear").c_str()), 0.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "quadratic").c_str()), 0.0f);
 		}
 
 		// Create camera transformations

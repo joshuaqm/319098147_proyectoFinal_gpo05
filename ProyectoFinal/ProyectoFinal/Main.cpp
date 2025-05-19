@@ -340,6 +340,9 @@ int main()
 		animateCircularDrift(deltaTime);
 		UpdateDayNightTransition(deltaTime);
 		windTime += deltaTime;
+
+		updateListener(camera.GetPosition(), camera.GetFront());
+
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
@@ -475,9 +478,6 @@ int main()
 		//Carga de modelos
 		view = camera.GetViewMatrix();
 
-		// Audio 
-		updateListener(camera.GetPosition(), camera.GetFront());
-
 		/////////////////////////-Ambientacion-////////////////////////////////
 		//Arbustos
 		glm::vec3 arbustoPosiciones[] = { glm::vec3(58.0f, -10.0f, 20.0f), glm::vec3(45.0f, -10.0f, 22.0f), glm::vec3(75.0f, -10.0f, 21.0f), glm::vec3(85.0f, -10.0f, 21.0f) };
@@ -551,7 +551,7 @@ int main()
 		Casa.Draw(lightingShader);
 		//Pisos y techos
 		//Piso, techo, piso cocina, techo cocina, piso habitacion, techo habitacion
-		glm::vec3 pisosPosicion[] = { glm::vec3(-3.0f, 5.55f, 3.0f), glm::vec3(-2.0f, 11.2f, 2.65f), glm::vec3(-10.2f, 4.1f, -12.7f),
+		glm::vec3 pisosPosicion[] = { glm::vec3(-3.0f, 5.55f, 3.0f), glm::vec3(-1.8f, 11.2f, 2.65f), glm::vec3(-10.2f, 4.1f, -12.7f),
 			glm::vec3(-10.2f, 13.0f, -12.7f), glm::vec3(6.8f, 25.4f, 0.2f), glm::vec3(3.0f, 35.3f, 0.19f) };
 		glm::vec3 pisosEscala[] = { glm::vec3(2.7f, 1.0f, 1.9f), glm::vec3(2.1f, 5.5f, 1.75f), glm::vec3(1.28f, 1.0f, 0.84f),
 			glm::vec3(1.28f, 1.0f, 0.84f), glm::vec3(1.75f, 1.0f, 1.35f), glm::vec3(2.155f, 1.0f, 1.36f) };
@@ -1070,9 +1070,9 @@ bool initAudio(const char* wavFile) {
 	alSourcei(audioSource, AL_LOOPING, AL_TRUE);
 
 	// Configurar atenuación 3D
-	alSourcef(audioSource, AL_REFERENCE_DISTANCE, 2.0f);
-	alSourcef(audioSource, AL_ROLLOFF_FACTOR, 1.0f);
-	alSourcef(audioSource, AL_MAX_DISTANCE, 50.0f);
+	alSourcef(audioSource, AL_REFERENCE_DISTANCE, 1.0f); //Distancia a la que el volumen es máximo (sin atenuación).
+	alSourcef(audioSource, AL_ROLLOFF_FACTOR, 2.0f); //Qué tan rápido cae el volumen con la distancia.
+	alSourcef(audioSource, AL_MAX_DISTANCE, 10.0f); //Distancia máxima donde la fuente puede oírse (después de esta distancia el volumen es cero).
 
 	// Posición fija
 	alSource3f(audioSource, AL_POSITION, audioSourcePos.x, audioSourcePos.y, audioSourcePos.z);

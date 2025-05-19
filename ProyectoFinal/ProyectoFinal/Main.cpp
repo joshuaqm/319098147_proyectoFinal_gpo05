@@ -12,12 +12,17 @@
 #include <glm/gtc/type_ptr.hpp>
 //Load Models
 #include "SOIL2/SOIL2.h"
-
+//Audio libs
+// Audio includes
+#include <AL/al.h>
+#include <AL/alc.h>
 
 // Other includes
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#define DR_WAV_IMPLEMENTATION
+#include "dr_wav.h"
 
 // Function prototypes
 // Funciones de interaccion
@@ -39,6 +44,12 @@ float smoothstep(float edge0, float edge1, float x) {
 }
 void updateTrampolineJump(float deltaTime);
 
+//Funciones de audio 
+bool loadWavFile(const char* filename, ALuint buffer);
+bool initAudio(const char* wavFile);
+void updateListener(const glm::vec3& listenerPos, const glm::vec3& listenerDir);
+void toggleAudioPlayback();
+void cleanupAudio();
 
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -133,6 +144,22 @@ Spotlight flashlight = {
 };
 
 void UpdateFlashlight(Camera& camera, Spotlight& flashlight);
+
+//Variables de audio 
+ALCdevice* audioDevice = nullptr;
+ALCcontext* audioContext = nullptr;
+ALuint audioBuffer = 0;
+ALuint audioSource = 0;
+
+// Posición estática del audio en el mundo
+glm::vec3 audioSourcePos(0.0f, 0.0f, 0.0f);
+
+// Archivo de audio
+const char* audioFile = "./audio/sintetizador.wav";
+
+// Control de reproducción
+bool audioPlaying = false;
+bool keyPressedM = false;
 
 
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
@@ -296,6 +323,11 @@ int main()
 
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 350.0f);
 
+	if (!initAudio(audioFile)) {
+		std::cerr << "Error inicializando audio\n";
+		return -1;
+	}
+
 	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -442,6 +474,9 @@ int main()
 
 		//Carga de modelos
 		view = camera.GetViewMatrix();
+
+		// Audio 
+		updateListener(camera.GetPosition(), camera.GetFront());
 
 		/////////////////////////-Ambientacion-////////////////////////////////
 		//Arbustos
@@ -793,7 +828,7 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
-
+	cleanupAudio();
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
 
@@ -900,6 +935,15 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	else if (!keys[GLFW_KEY_1]) {
 		keyPressed3 = false;
 	}
+
+	if (key == GLFW_KEY_M && action == GLFW_PRESS && !keyPressedM) {
+		toggleAudioPlayback();
+		keyPressedM = true;
+	}
+	if (key == GLFW_KEY_M && action == GLFW_RELEASE) {
+		keyPressedM = false;
+	}
+
 }
 
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
@@ -970,3 +1014,103 @@ void UpdateFlashlight(Camera& camera, Spotlight& flashlight) {
 	flashlight.position = camera.GetPosition();
 	flashlight.direction = camera.GetFront();
 }
+bool loadWavFile(const char* filename, ALuint buffer) {
+	drwav wav;
+	if (!drwav_init_file(&wav, filename, NULL)) {
+		std::cerr << "Error al cargar el archivo WAV: " << filename << std::endl;
+		return false;
+	}
+
+	float* pSampleData = (float*)malloc(wav.totalPCMFrameCount * wav.channels * sizeof(float));
+	drwav_read_pcm_frames_f32(&wav, wav.totalPCMFrameCount, pSampleData);
+
+	short* pcmData = (short*)malloc(wav.totalPCMFrameCount * wav.channels * sizeof(short));
+	for (drwav_uint64 i = 0; i < wav.totalPCMFrameCount * wav.channels; ++i) {
+		pcmData[i] = (short)(pSampleData[i] * 32767.0f);
+	}
+
+	ALenum format;
+	if (wav.channels == 1)
+		format = AL_FORMAT_MONO16;
+	else if (wav.channels == 2)
+		format = AL_FORMAT_STEREO16;
+	else {
+		std::cerr << "Formato no soportado: " << wav.channels << " canales" << std::endl;
+		drwav_uninit(&wav);
+		free(pSampleData);
+		free(pcmData);
+		return false;
+	}
+
+	alBufferData(buffer, format, pcmData, wav.totalPCMFrameCount * wav.channels * sizeof(short), wav.sampleRate);
+
+	drwav_uninit(&wav);
+	free(pSampleData);
+	free(pcmData);
+	return true;
+}
+
+bool initAudio(const char* wavFile) {
+	audioDevice = alcOpenDevice(nullptr);
+	if (!audioDevice) return false;
+
+	audioContext = alcCreateContext(audioDevice, nullptr);
+	if (!audioContext || !alcMakeContextCurrent(audioContext)) {
+		if (audioContext) alcDestroyContext(audioContext);
+		alcCloseDevice(audioDevice);
+		return false;
+	}
+
+	alGenBuffers(1, &audioBuffer);
+	alGenSources(1, &audioSource);
+
+	if (!loadWavFile(wavFile, audioBuffer)) return false;
+
+	alSourcei(audioSource, AL_BUFFER, audioBuffer);
+	alSourcei(audioSource, AL_LOOPING, AL_TRUE);
+
+	// Configurar atenuación 3D
+	alSourcef(audioSource, AL_REFERENCE_DISTANCE, 2.0f);
+	alSourcef(audioSource, AL_ROLLOFF_FACTOR, 1.0f);
+	alSourcef(audioSource, AL_MAX_DISTANCE, 50.0f);
+
+	// Posición fija
+	alSource3f(audioSource, AL_POSITION, audioSourcePos.x, audioSourcePos.y, audioSourcePos.z);
+
+	return true;
+}
+
+
+void updateListener(const glm::vec3& listenerPos, const glm::vec3& listenerDir) {
+	alListener3f(AL_POSITION, listenerPos.x, listenerPos.y, listenerPos.z);
+	float orientation[6] = {
+		listenerDir.x, listenerDir.y, listenerDir.z,
+		0.0f, 1.0f, 0.0f
+	};
+	alListenerfv(AL_ORIENTATION, orientation);
+}
+
+void toggleAudioPlayback() {
+	ALint state;
+	alGetSourcei(audioSource, AL_SOURCE_STATE, &state);
+
+	if (state == AL_PLAYING) {
+		alSourcePause(audioSource);
+		audioPlaying = false;
+	}
+	else {
+		alSourcePlay(audioSource);
+		audioPlaying = true;
+	}
+}
+
+
+void cleanupAudio() {
+	alSourceStop(audioSource);
+	alDeleteSources(1, &audioSource);
+	alDeleteBuffers(1, &audioBuffer);
+	alcMakeContextCurrent(nullptr);
+	alcDestroyContext(audioContext);
+	alcCloseDevice(audioDevice);
+}
+

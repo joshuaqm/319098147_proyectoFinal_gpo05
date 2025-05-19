@@ -239,6 +239,7 @@ int main()
 	Model Cajones((char*)"Models/cajones.obj");
 	Model Cama((char*)"Models/cama.obj");
 	Model Pared_Habitacion((char*)"Models/pared_habitacion.obj");
+	Model Pared_Habitacion_Puerta((char*)"Models/pared_habitacion_puerta.obj");
 	Model Television_Habitacion((char*)"Models/television_habitacion.obj");
 	Model Trampolin((char*)"Models/trampolin.obj");
 	Model Ventana_Habitacion((char*)"Models/ventana_habitacion.obj");
@@ -441,11 +442,14 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Casa.Draw(lightingShader);
 		//Pisos y techos
-		//Piso, techo, piso cocina, techo cocina, piso habitacion, techo habitacion
-		glm::vec3 pisosPosicion[] = { glm::vec3(-3.0f, 5.55f, 3.0f), glm::vec3(3.75f, 13.65f, 2.65f), glm::vec3(-10.2f, 4.1f, -12.7f), glm::vec3(-10.2f, 13.0f, -12.7f), glm::vec3(3.0f, 25.4f, 0.2f), glm::vec3(3.0f, 35.3f, 0.19f)};
-		glm::vec3 pisosEscala[] = {glm::vec3(2.7f, 1.0f, 1.9f), glm::vec3(2.55f, 1.0f, 1.75f), glm::vec3(1.28f, 1.0f, 0.84f), glm::vec3(1.28f, 1.0f, 0.84f), glm::vec3(2.15f, 1.0f, 1.35f), glm::vec3(2.155f, 1.0f, 1.36f)};
-		float radianes[] = {180.0f, 0.0f, 90.0f, 90.0f, 0.0f, 0.0f};
-		glm::vec3 pisosRotacion[] = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)};
+		//Piso, techo, piso cocina, techo cocina, piso habitacion, techo habitacion, piso segundo piso
+		glm::vec3 pisosPosicion[] = { glm::vec3(-3.0f, 5.55f, 3.0f), glm::vec3(3.75f, 13.65f, 2.65f), glm::vec3(-10.2f, 4.1f, -12.7f), 
+			glm::vec3(-10.2f, 13.0f, -12.7f), glm::vec3(3.0f, 25.4f, 0.2f), glm::vec3(3.0f, 35.3f, 0.19f), glm::vec3(3.0f, 15.5f, 0.2f) };
+		glm::vec3 pisosEscala[] = {glm::vec3(2.7f, 1.0f, 1.9f), glm::vec3(2.55f, 1.0f, 1.75f), glm::vec3(1.28f, 1.0f, 0.84f), 
+			glm::vec3(1.28f, 1.0f, 0.84f), glm::vec3(2.15f, 1.0f, 1.35f), glm::vec3(2.155f, 1.0f, 1.36f), glm::vec3(2.15f, 1.0f, 1.35f) };
+		float radianes[] = {180.0f, 0.0f, 90.0f, 90.0f, 0.0f, 0.0f, 0.0f};
+		glm::vec3 pisosRotacion[] = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),	
+			glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
 		for (int i = 0; i < sizeof(pisosPosicion) / sizeof(pisosPosicion[0]); ++i) {
 			model = glm::mat4(1);
 			model = glm::translate(model, pisosPosicion[i]);
@@ -456,7 +460,7 @@ int main()
 		}
 		//Escaleras
 		model = glm::mat4(1);
-
+		model = glm::translate(model, glm::vec3(0.0f, 3.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Escaleras_Interior.Draw(lightingShader);
 		
@@ -464,8 +468,8 @@ int main()
 		////////////////////////-Estructura-////////////////////////////////
 		//Paredes
 		// Pared izquierda, derecha, posterior
-		glm::vec3 paredesCocinaPosicion[] = {glm::vec3(-15.57f, 3.3f, -9.6f), glm::vec3(12.0f, 3.3f, -9.6f), glm::vec3(-10.2f, 3.3f, -32.3f)};
-		glm::vec3 paredesCocinaEscala[] = {glm::vec3(1.0f, 2.06f, 0.85f), glm::vec3(1.0f, 2.06f, 0.85f), glm::vec3(1.0f, 2.06f, 1.28f)};
+		glm::vec3 paredesCocinaPosicion[] = {glm::vec3(-15.57f, 3.1f, -9.6f), glm::vec3(12.0f, 3.1f, -9.6f), glm::vec3(-10.2f, 3.1f, -32.3f)};
+		glm::vec3 paredesCocinaEscala[] = {glm::vec3(1.0f, 1.86f, 0.85f), glm::vec3(1.0f, 1.86f, 0.85f), glm::vec3(1.0f, 1.86f, 1.28f)};
 		float paredesCocinaRadianes[] = {0.0f, 0.0f, 90.0f, 90.0f};
 		glm::vec3 paredesCocinaRotacion[] = {glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)};
 		for (int i = 0; i < sizeof(paredesCocinaPosicion) / sizeof(paredesCocinaPosicion[0]); ++i) {
@@ -478,9 +482,9 @@ int main()
 		}
 		//Pared anterior
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-10.2f, 3.3f, -14.2f));
+		model = glm::translate(model, glm::vec3(-10.2f, 3.1f, -14.2f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 2.06f, 1.28f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.86f, 1.28f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Pared_Cocina_Anterior.Draw(lightingShader);
 		////Ventana
@@ -594,11 +598,11 @@ int main()
 		//////////////////////-Habitacion-////////////////////////////////
 		//////////////////////-Estructura-////////////////////////////////
 		//Paredes 
-		// Posterior, derecha, anterior, izquierda
-		glm::vec3 paredesHabitacionPosicion[] = { glm::vec3(16.5f, 28.5f, -19.7f), glm::vec3(25.3f, 28.5f, -6.6f), glm::vec3(16.5f, 28.5f, -1.5f), glm::vec3(7.1f, 28.5f, -6.6f)};
-		glm::vec3 paredesHabitacionEscala[] = {glm::vec3(3.2f, 3.2f, 1.5f),glm::vec3(3.2f, 3.2f, 1.5f), glm::vec3(3.2f, 3.2f, 1.5f), glm::vec3(3.2f, 3.2f, 1.5f)};
-		float paredesHabitacionRadianes[] = {0.0f, 270.0f, 0.0f,270.0f};
-		glm::vec3 paredesHabitacionRotacion[] = {glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f)};
+		// Posterior, derecha, anterior
+		glm::vec3 paredesHabitacionPosicion[] = { glm::vec3(16.5f, 28.5f, -19.7f), glm::vec3(25.3f, 28.5f, -6.6f), glm::vec3(16.5f, 28.5f, -1.5f)};
+		glm::vec3 paredesHabitacionEscala[] = {glm::vec3(3.2f, 3.2f, 1.5f),glm::vec3(3.2f, 3.2f, 1.5f), glm::vec3(3.2f, 3.2f, 1.5f)};
+		float paredesHabitacionRadianes[] = {0.0f, 270.0f, 0.0f};
+		glm::vec3 paredesHabitacionRotacion[] = {glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f)};
 		for (int i = 0; i < sizeof(paredesHabitacionPosicion) / sizeof(paredesHabitacionPosicion[0]); ++i) {
 			model = glm::mat4(1);
 			model = glm::translate(model, paredesHabitacionPosicion[i]);
@@ -607,6 +611,13 @@ int main()
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			Pared_Habitacion.Draw(lightingShader);
 		}
+		//Con puerta
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(3.8f, 30.4f, -9.3f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Pared_Habitacion_Puerta.Draw(lightingShader);
 
 		//Ventana Habitacion 1
 		model = glm::mat4(1);

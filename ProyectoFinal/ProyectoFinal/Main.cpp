@@ -21,7 +21,7 @@
 
 // Function prototypes
 // Funciones de interaccion
-void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode);
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
 
@@ -62,7 +62,7 @@ bool active;
 //Animacion de luces
 bool isNight = false;
 float timeOfDay = 0.0f;
-float transitionSpeed = 0.25f;  
+float transitionSpeed = 0.25f;
 bool transitionActive = false;
 bool lightsOff = true; // Estado de las luces
 bool keyPressed2 = false; // Registra el estado de la tecla 2
@@ -120,16 +120,16 @@ struct Spotlight {
 };
 
 Spotlight flashlight = {
-	glm::vec3(0.0f),                  
-	glm::vec3(0.0f),                  
-	glm::vec3(0.2f),                 
-	glm::vec3(1.5f, 1.5f, 1.3f),    
-	glm::vec3(2.0f),                 
-	glm::cos(glm::radians(16.0f)),   
-	glm::cos(glm::radians(30.0f)),   
-	1.0f,                           
-	0.05f,                          
-	0.008f                          
+	glm::vec3(0.0f),
+	glm::vec3(0.0f),
+	glm::vec3(0.2f),
+	glm::vec3(1.5f, 1.5f, 1.3f),
+	glm::vec3(2.0f),
+	glm::cos(glm::radians(16.0f)),
+	glm::cos(glm::radians(30.0f)),
+	1.0f,
+	0.05f,
+	0.008f
 };
 
 void UpdateFlashlight(Camera& camera, Spotlight& flashlight);
@@ -445,7 +445,7 @@ int main()
 
 		/////////////////////////-Ambientacion-////////////////////////////////
 		//Arbustos
-		glm::vec3 arbustoPosiciones[] = {glm::vec3(58.0f, -10.0f, 20.0f), glm::vec3(45.0f, -10.0f, 22.0f), glm::vec3(75.0f, -10.0f, 21.0f), glm::vec3(85.0f, -10.0f, 21.0f)};
+		glm::vec3 arbustoPosiciones[] = { glm::vec3(58.0f, -10.0f, 20.0f), glm::vec3(45.0f, -10.0f, 22.0f), glm::vec3(75.0f, -10.0f, 21.0f), glm::vec3(85.0f, -10.0f, 21.0f) };
 		glm::vec3 arbustoEscalas[] = {
 			glm::vec3(18.0f, 20.0f, 18.0f),
 			glm::vec3(10.0f, 10.0f, 10.0f),
@@ -462,8 +462,8 @@ int main()
 			Arbusto.Draw(lightingShader);
 		}
 		//Arboles
-		glm::vec3 arbolPosiciones[] = {glm::vec3(90.0f, -10.0f, -30.0f), glm::vec3(-90.0f, -10.0f, 30.0f), glm::vec3(-80.0f, -10.0f, -30.0f)};
-		glm::vec3 arbolEscalas[] = {glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(10.0f, 10.0f, 10.0f)};
+		glm::vec3 arbolPosiciones[] = { glm::vec3(90.0f, -10.0f, -30.0f), glm::vec3(-90.0f, -10.0f, 30.0f), glm::vec3(-80.0f, -10.0f, -30.0f) };
+		glm::vec3 arbolEscalas[] = { glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(10.0f, 10.0f, 10.0f) };
 		for (int i = 0; i < sizeof(arbolPosiciones) / sizeof(arbolPosiciones[0]); ++i) {
 			model = glm::mat4(1);
 			model = glm::translate(model, arbolPosiciones[i]);
@@ -472,7 +472,7 @@ int main()
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			Arbol.Draw(lightingShader);
 		}
-		
+
 		////Faro
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(-17.0f, -10.0f, 80.0f));
@@ -517,11 +517,11 @@ int main()
 		//Pisos y techos
 		//Piso, techo, piso cocina, techo cocina, piso habitacion, techo habitacion
 		glm::vec3 pisosPosicion[] = { glm::vec3(-3.0f, 5.55f, 3.0f), glm::vec3(-2.0f, 11.2f, 2.65f), glm::vec3(-10.2f, 4.1f, -12.7f),
-			glm::vec3(-10.2f, 13.0f, -12.7f), glm::vec3(6.8f, 25.4f, 0.2f), glm::vec3(3.0f, 35.3f, 0.19f)};
-		glm::vec3 pisosEscala[] = {glm::vec3(2.7f, 1.0f, 1.9f), glm::vec3(2.1f, 5.5f, 1.75f), glm::vec3(1.28f, 1.0f, 0.84f), 
+			glm::vec3(-10.2f, 13.0f, -12.7f), glm::vec3(6.8f, 25.4f, 0.2f), glm::vec3(3.0f, 35.3f, 0.19f) };
+		glm::vec3 pisosEscala[] = { glm::vec3(2.7f, 1.0f, 1.9f), glm::vec3(2.1f, 5.5f, 1.75f), glm::vec3(1.28f, 1.0f, 0.84f),
 			glm::vec3(1.28f, 1.0f, 0.84f), glm::vec3(1.75f, 1.0f, 1.35f), glm::vec3(2.155f, 1.0f, 1.36f) };
-		float radianes[] = {180.0f, 0.0f, 90.0f, 90.0f, 0.0f, 0.0f};
-		glm::vec3 pisosRotacion[] = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),	
+		float radianes[] = { 180.0f, 0.0f, 90.0f, 90.0f, 0.0f, 0.0f };
+		glm::vec3 pisosRotacion[] = { glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
 		for (int i = 0; i < sizeof(pisosPosicion) / sizeof(pisosPosicion[0]); ++i) {
 			model = glm::mat4(1);
@@ -545,15 +545,15 @@ int main()
 		model = glm::translate(model, glm::vec3(2.0f, 12.5f, 2.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Escaleras_Interior.Draw(lightingShader);
-		
+
 		////////////////////////-Cocina-////////////////////////////////
 		////////////////////////-Estructura-////////////////////////////////
 		//Paredes
 		// Pared izquierda, derecha, posterior
-		glm::vec3 paredesCocinaPosicion[] = {glm::vec3(-15.57f, 3.1f, -9.6f), glm::vec3(12.0f, 3.1f, -9.6f), glm::vec3(-10.2f, 3.1f, -32.3f)};
-		glm::vec3 paredesCocinaEscala[] = {glm::vec3(1.0f, 1.86f, 0.85f), glm::vec3(1.0f, 1.86f, 0.85f), glm::vec3(1.0f, 1.86f, 1.28f)};
-		float paredesCocinaRadianes[] = {0.0f, 0.0f, 90.0f, 90.0f};
-		glm::vec3 paredesCocinaRotacion[] = {glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)};
+		glm::vec3 paredesCocinaPosicion[] = { glm::vec3(-15.57f, 3.1f, -9.6f), glm::vec3(12.0f, 3.1f, -9.6f), glm::vec3(-10.2f, 3.1f, -32.3f) };
+		glm::vec3 paredesCocinaEscala[] = { glm::vec3(1.0f, 1.86f, 0.85f), glm::vec3(1.0f, 1.86f, 0.85f), glm::vec3(1.0f, 1.86f, 1.28f) };
+		float paredesCocinaRadianes[] = { 0.0f, 0.0f, 90.0f, 90.0f };
+		glm::vec3 paredesCocinaRotacion[] = { glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
 		for (int i = 0; i < sizeof(paredesCocinaPosicion) / sizeof(paredesCocinaPosicion[0]); ++i) {
 			model = glm::mat4(1);
 			model = glm::translate(model, paredesCocinaPosicion[i]);
@@ -603,10 +603,10 @@ int main()
 
 		//////////////////////////-Objetos-////////////////////////////////
 		//Alacenas
-		glm::vec3 alacenasPosiciones[] = {glm::vec3(-19.0f, 4.74f, -17.57f), glm::vec3(-21.1f, 4.74f, -14.0f), glm::vec3(-19.0f, 4.74f, -10.5f), glm::vec3(-17.1f, 4.74f, -14.0f), glm::vec3(-13.1f, 4.74f, -14.0f)};
-		glm::vec3 alacenasEscalas[] = {glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f)};
-		glm::vec3 alacenasRotaciones[] = {glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 270.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 270.0f, 0.0f), glm::vec3(0.0f, 270.0f, 0.0f)};
-		
+		glm::vec3 alacenasPosiciones[] = { glm::vec3(-19.0f, 4.74f, -17.57f), glm::vec3(-21.1f, 4.74f, -14.0f), glm::vec3(-19.0f, 4.74f, -10.5f), glm::vec3(-17.1f, 4.74f, -14.0f), glm::vec3(-13.1f, 4.74f, -14.0f) };
+		glm::vec3 alacenasEscalas[] = { glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(1.2f, 1.0f, 1.0f) };
+		glm::vec3 alacenasRotaciones[] = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 270.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 270.0f, 0.0f), glm::vec3(0.0f, 270.0f, 0.0f) };
+
 		for (int i = 0; i < sizeof(alacenasPosiciones) / sizeof(alacenasPosiciones[0]); ++i) {
 			model = glm::mat4(1);
 			model = glm::translate(model, alacenasPosiciones[i]);
@@ -632,7 +632,7 @@ int main()
 
 		////Estufa
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-21.15f, 5.91f, -23.85f));	
+		model = glm::translate(model, glm::vec3(-21.15f, 5.91f, -23.85f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Estufa.Draw(lightingShader);
 		////Campana
@@ -681,10 +681,10 @@ int main()
 		//////////////////////-Estructura-////////////////////////////////
 		//Paredes 
 		// Posterior, derecha, anterior
-		glm::vec3 paredesHabitacionPosicion[] = { glm::vec3(16.5f, 28.5f, -19.7f), glm::vec3(25.3f, 28.5f, -6.6f), glm::vec3(16.5f, 28.5f, -1.5f)};
-		glm::vec3 paredesHabitacionEscala[] = {glm::vec3(3.2f, 3.2f, 1.5f),glm::vec3(3.2f, 3.2f, 1.5f), glm::vec3(3.2f, 3.2f, 1.5f)};
-		float paredesHabitacionRadianes[] = {0.0f, 270.0f, 0.0f};
-		glm::vec3 paredesHabitacionRotacion[] = {glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f)};
+		glm::vec3 paredesHabitacionPosicion[] = { glm::vec3(16.5f, 28.5f, -19.7f), glm::vec3(25.3f, 28.5f, -6.6f), glm::vec3(16.5f, 28.5f, -1.5f) };
+		glm::vec3 paredesHabitacionEscala[] = { glm::vec3(3.2f, 3.2f, 1.5f),glm::vec3(3.2f, 3.2f, 1.5f), glm::vec3(3.2f, 3.2f, 1.5f) };
+		float paredesHabitacionRadianes[] = { 0.0f, 270.0f, 0.0f };
+		glm::vec3 paredesHabitacionRotacion[] = { glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f) };
 		for (int i = 0; i < sizeof(paredesHabitacionPosicion) / sizeof(paredesHabitacionPosicion[0]); ++i) {
 			model = glm::mat4(1);
 			model = glm::translate(model, paredesHabitacionPosicion[i]);
@@ -890,7 +890,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		keyPressed2 = true;
 	}
 	else if (!keys[GLFW_KEY_L]) {
-		keyPressed2 = false; 
+		keyPressed2 = false;
 	}
 
 	if (keys[GLFW_KEY_1] && !keyPressed3) {

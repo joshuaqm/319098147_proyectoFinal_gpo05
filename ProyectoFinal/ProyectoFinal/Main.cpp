@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 // Other Libs
 #include "stb_image.h"
+#include <random>
 // GLM Mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -43,6 +44,7 @@ float smoothstep(float edge0, float edge1, float x) {
 	return x * x * (3.0f - 2.0f * x);
 }
 void updateTrampolineJump(float deltaTime);
+void actualizarCaidaHojas(float deltaTime);
 
 //Funciones de audio 
 bool loadWavFile(const char* filename, ALuint buffer);
@@ -111,6 +113,18 @@ glm::mat4 applyTreeWind(glm::mat4 model, float offset) {
 
 	return model;
 }
+
+// Animacion hojas
+float hojasYOffset[3] = { 0.0f, 0.0f, 0.0f };
+float hojasVelocidadCaida = 13.0f;
+float hojasLimiteInferiorBase = -20.0f; // Límite base fijo que vamos a modificar
+float hojasLimiteInferiorMaxFactor = 2.0f; // Factor máximo para multiplicar el límite base
+float hojasLimiteSuperior = 22.0f;
+
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<float> disFactor(1.0f, hojasLimiteInferiorMaxFactor);
+
 
 // Linterna/Spotlight
 bool flashlightOn = true;
@@ -269,6 +283,7 @@ int main()
 	Model Cesped((char*)"Models/cesped.obj");
 	Model Cielo((char*)"Models/cieloo.obj");
 	Model Cart((char*)"Models/cart.obj");
+	Model Hojas((char*)"Models/hojas.obj");
 
 	// Modelos segundo piso
 	Model Escaleras_Interior((char*)"Models/escaleras_interior.obj");
@@ -340,6 +355,7 @@ int main()
 		animateCircularDrift(deltaTime);
 		UpdateDayNightTransition(deltaTime);
 		windTime += deltaTime;
+		actualizarCaidaHojas(deltaTime);
 
 		updateListener(camera.GetPosition(), camera.GetFront());
 
@@ -497,7 +513,7 @@ int main()
 			Arbusto.Draw(lightingShader);
 		}
 		//Arboles
-		glm::vec3 arbolPosiciones[] = { glm::vec3(90.0f, -10.0f, -30.0f), glm::vec3(-90.0f, -10.0f, 30.0f), glm::vec3(-80.0f, -10.0f, -30.0f) };
+		glm::vec3 arbolPosiciones[] = { glm::vec3(80.0f, -10.0f, -30.0f), glm::vec3(-90.0f, -10.0f, 30.0f), glm::vec3(-80.0f, -10.0f, -30.0f) };
 		glm::vec3 arbolEscalas[] = { glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(10.0f, 10.0f, 10.0f) };
 		for (int i = 0; i < sizeof(arbolPosiciones) / sizeof(arbolPosiciones[0]); ++i) {
 			model = glm::mat4(1);
@@ -506,6 +522,19 @@ int main()
 			model = applyTreeWind(model, i * 0.5f); // Aplicar viento con un offset diferente para cada árbol
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			Arbol.Draw(lightingShader);
+		}
+		//Hojas
+		glm::vec3 hojasPosiciones[] = { glm::vec3(80.0f, -10.0f, -30.0f), glm::vec3(-90.0f, -10.0f, 30.0f), glm::vec3(-80.0f, -10.0f, -30.0f) };
+		glm::vec3 hojasEscalas[] = { glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(10.0f, 10.0f, 10.0f) };
+		for (int i = 0; i < sizeof(hojasPosiciones) / sizeof(hojasPosiciones[0]); ++i) {
+			model = glm::mat4(1);
+			// Aplica el desplazamiento vertical para la animación de caída
+			glm::vec3 posConCaida = hojasPosiciones[i] + glm::vec3(0.0f, hojasYOffset[i], 0.0f);
+			model = glm::translate(model, posConCaida);
+			model = glm::scale(model, hojasEscalas[i]);
+			model = applyTreeWind(model, i * 0.5f); // Aplica viento como antes
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			Hojas.Draw(lightingShader);
 		}
 
 		////Faro
@@ -1014,6 +1043,21 @@ void UpdateFlashlight(Camera& camera, Spotlight& flashlight) {
 	flashlight.position = camera.GetPosition();
 	flashlight.direction = camera.GetFront();
 }
+
+void actualizarCaidaHojas(float deltaTime) {
+	for (int i = 0; i < 3; ++i) {
+		hojasYOffset[i] -= hojasVelocidadCaida * deltaTime;
+
+		// Multiplica el límite base por un factor aleatorio en cada reinicio
+		float limiteInferiorAleatorio = hojasLimiteInferiorBase * disFactor(gen);
+
+		if (hojasYOffset[i] < limiteInferiorAleatorio) {
+			hojasYOffset[i] = hojasLimiteSuperior;
+			// No necesitas almacenar el límite, lo recalculas cada vez
+		}
+	}
+}
+
 bool loadWavFile(const char* filename, ALuint buffer) {
 	drwav wav;
 	if (!drwav_init_file(&wav, filename, NULL)) {

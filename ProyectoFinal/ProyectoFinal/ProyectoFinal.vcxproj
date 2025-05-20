@@ -98,6 +98,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)/External Libraries/openal-soft-1.24.3-bin/libs/Win32;$(SolutionDir)/External Libraries/assimp/lib;$(SolutionDir)/External Libraries/SOIL2/lib;$(SolutionDir)/External Libraries/GLFW/lib-vc2015;$(SolutionDir)/External Libraries/GLEW/lib/Release/Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenAL32.lib;opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,6 +118,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)/External Libraries/openal-soft-1.24.3-bin/libs/Win32;$(SolutionDir)/External Libraries/assimp/lib;$(SolutionDir)/External Libraries/SOIL2/lib;$(SolutionDir)/External Libraries/GLFW/lib-vc2015;$(SolutionDir)/External Libraries/GLEW/lib/Release/Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenAL32.lib;opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -132,6 +134,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)/External Libraries/openal-soft-1.24.3-bin/libs/Win32;$(SolutionDir)/External Libraries/assimp/lib;$(SolutionDir)/External Libraries/SOIL2/lib;$(SolutionDir)/External Libraries/GLFW/lib-vc2015;$(SolutionDir)/External Libraries/GLEW/lib/Release/Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenAL32.lib;opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,6 +154,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)/External Libraries/openal-soft-1.24.3-bin/libs/Win32;$(SolutionDir)/External Libraries/assimp/lib;$(SolutionDir)/External Libraries/SOIL2/lib;$(SolutionDir)/External Libraries/GLFW/lib-vc2015;$(SolutionDir)/External Libraries/GLEW/lib/Release/Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenAL32.lib;opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

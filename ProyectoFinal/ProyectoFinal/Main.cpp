@@ -957,11 +957,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		keyPressed2 = false;
 	}
 
-	if (keys[GLFW_KEY_1] && !keyPressed3) {
+	if (keys[GLFW_KEY_F] && !keyPressed3) {
 		flashlightOn = !flashlightOn;
 		keyPressed3 = true;
 	}
-	else if (!keys[GLFW_KEY_1]) {
+	else if (!keys[GLFW_KEY_F]) {
 		keyPressed3 = false;
 	}
 

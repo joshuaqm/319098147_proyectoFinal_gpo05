@@ -13,11 +13,9 @@
 #include <glm/gtc/type_ptr.hpp>
 //Load Models
 #include "SOIL2/SOIL2.h"
-//Audio libs
 // Audio includes
 #include <AL/al.h>
 #include <AL/alc.h>
-
 // Other includes
 #include "Shader.h"
 #include "Camera.h"
@@ -30,6 +28,9 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+// Camera
+Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
+//Camera  camera(glm::vec3(-8.0f, 10.0f, 0.0f));
 
 // Funciones de animacion
 void animateCircularDrift(float deltaTime);
@@ -58,18 +59,12 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 //const GLuint WIDTH = 1280, HEIGHT = 720;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
-// Camera
-Camera  camera(glm::vec3(0.0f, 0.0f, 135.0f));
-//Camera  camera(glm::vec3(-8.0f, 10.0f, 0.0f));
-
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
 bool firstMouse = true;
 
 // Variables globales
-// Light attributes
-glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 bool active;
 
 //Animacion de luces
@@ -175,8 +170,6 @@ const char* audioFile = "./audio/sintetizador_mono.wav";
 bool audioPlaying = false;
 bool keyPressedM = false;
 
-
-glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 float vertices[] = {
 	 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -220,8 +213,6 @@ float vertices[] = {
 	   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
 	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
-
-glm::vec3 Light1 = glm::vec3(1.0f, 1.0f, 0.0f);
 
 // Luces puntuales
 glm::vec3 pointLightPositions[] = {

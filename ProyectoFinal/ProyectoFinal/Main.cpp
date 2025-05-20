@@ -152,10 +152,10 @@ ALuint audioBuffer = 0;
 ALuint audioSource = 0;
 
 // Posición estática del audio en el mundo
-glm::vec3 audioSourcePos(0.0f, 0.0f, 0.0f);
+glm::vec3 audioSourcePos(11.8f, 27.8f, -15.9f);
 
 // Archivo de audio
-const char* audioFile = "./audio/sintetizador.wav";
+const char* audioFile = "./audio/sintetizador_mono.wav";
 
 // Control de reproducción
 bool audioPlaying = false;
@@ -1070,9 +1070,9 @@ bool initAudio(const char* wavFile) {
 	alSourcei(audioSource, AL_LOOPING, AL_TRUE);
 
 	// Configurar atenuación 3D
-	alSourcef(audioSource, AL_REFERENCE_DISTANCE, 1.0f); //Distancia a la que el volumen es máximo (sin atenuación).
+	alSourcef(audioSource, AL_REFERENCE_DISTANCE, 7.0f); //Distancia a la que el volumen es máximo (sin atenuación).
 	alSourcef(audioSource, AL_ROLLOFF_FACTOR, 2.0f); //Qué tan rápido cae el volumen con la distancia.
-	alSourcef(audioSource, AL_MAX_DISTANCE, 10.0f); //Distancia máxima donde la fuente puede oírse (después de esta distancia el volumen es cero).
+	alSourcef(audioSource, AL_MAX_DISTANCE, 25.0f); //Distancia máxima donde la fuente puede oírse (después de esta distancia el volumen es cero).
 
 	// Posición fija
 	alSource3f(audioSource, AL_POSITION, audioSourcePos.x, audioSourcePos.y, audioSourcePos.z);
@@ -1082,13 +1082,40 @@ bool initAudio(const char* wavFile) {
 
 
 void updateListener(const glm::vec3& listenerPos, const glm::vec3& listenerDir) {
+	// Calcula la distancia entre cámara y fuente de audio
+	float distance = glm::distance(listenerPos, audioSourcePos);
+
+	ALint state;
+	alGetSourcei(audioSource, AL_SOURCE_STATE, &state);
+
+	if (distance > 40.0f) {
+		// Pausa la fuente solo si está sonando y el usuario NO la ha pausado manualmente
+		if (state == AL_PLAYING && audioPlaying) {
+			alSourcePause(audioSource);
+			//std::cout << "Audio pausado automáticamente por distancia\n";
+		}
+	}
+	else {
+		// Reproduce la fuente solo si está pausada y el usuario quiere que suene (audioPlaying == true)
+		if (state != AL_PLAYING && audioPlaying) {
+			alSourcePlay(audioSource);
+			//std::cout << "Audio reanudado automáticamente por proximidad\n";
+		}
+	}
+
+	// Actualiza posición y orientación del listener (cámara)
 	alListener3f(AL_POSITION, listenerPos.x, listenerPos.y, listenerPos.z);
+
 	float orientation[6] = {
 		listenerDir.x, listenerDir.y, listenerDir.z,
 		0.0f, 1.0f, 0.0f
 	};
 	alListenerfv(AL_ORIENTATION, orientation);
+
+	// Debug (opcional)
+	//std::cout << "Distancia: " << distance << ", Estado fuente: " << state << ", audioPlaying: " << audioPlaying << std::endl;
 }
+
 
 void toggleAudioPlayback() {
 	ALint state;
@@ -1113,4 +1140,3 @@ void cleanupAudio() {
 	alcDestroyContext(audioContext);
 	alcCloseDevice(audioDevice);
 }
-

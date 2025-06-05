@@ -112,9 +112,9 @@ This project is an immersive 3D simulation developed using **OpenGL** that faith
 
 ## 📷 Preview
 
-* ![Facade Screenshot](docs/facade.png)
-* ![Kitchen Screenshot](docs/kitchen.png)
-* ![Bedroom Screenshot](docs/bedroom.png)
+![Facade Screenshot](docs/facade.png)
+![Kitchen Screenshot](docs/kitchen.png)
+![Bedroom Screenshot](docs/bedroom.png)
 *(See `/docs/` for full screenshots and comparisons)*
 
 ---
@@ -127,8 +127,8 @@ Key assets and tools used are licensed under Creative Commons. Full list in [doc
 
 ## ✅ Status
 
-*✔️ Completed for academic submission
-*🔧 Future ideas: More interaction, game-like elements
+* ✔️ **Completed for academic submission**
+* 🔧 **Future ideas:** More interaction, game-like elements
 
 ---
 

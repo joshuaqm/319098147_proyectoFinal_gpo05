@@ -1,10 +1,10 @@
 # 🏡 Proyecto Final - 3D Simulation of the Regular Show House
 
-**Author:** Francisco Joshua Quintero Montero, Obed Torres Pimentel
-**Course:** Computer Graphics and Human-Computer Interaction (1590)
-**Institution:** National Autonomous University of Mexico - School of Engineering
-**Semester:** 2025-2
-**Professor:** Eng. Carlos Aldair Román Balbuena
+* **Authors:** Francisco Joshua Quintero Montero, Obed Torres Pimentel
+* **Course:** Computer Graphics and Human-Computer Interaction (1590)
+* **Institution:** National Autonomous University of Mexico - School of Engineering
+* **Semester:** 2025-2
+* **Professor:** Eng. Carlos Aldair Román Balbuena
 
 ---
 

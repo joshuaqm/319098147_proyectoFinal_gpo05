@@ -1,4 +1,4 @@
-##References
+## References
 * Buy Autodesk Maya 2026 Software | 3D Animation Software. (s. f.). https://www.autodesk.com/products/maya/overview
 * Pricing ChatGPT. (s. f.). OpenAI. https://openai.com/es-419/chatgpt/pricing/
 * "Rigby || Regular Show" (https://skfb.ly/pqs6T) by metekrts is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
